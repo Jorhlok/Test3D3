@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.IntIntMap
 
 //adapted from FirstPersonCameraController
-class FirstPersonControllerCameraController(private val camera: Camera) : InputAdapter() {
+class FPControllerCamera(private val camera: Camera) : InputAdapter() {
     //    private val camera: Camera
     private val keys = IntIntMap()
     private val STRAFE_LEFT = Input.Keys.A
