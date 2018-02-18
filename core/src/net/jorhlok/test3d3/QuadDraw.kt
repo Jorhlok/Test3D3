@@ -185,22 +185,24 @@ class QuadDraw {
         return arr
     }
 
-    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, checker:Boolean) {
-        if (checker) distortedSpriteChecker(spr,a,b,c,d)
-        else distortedSprite(spr,a,b,c,d)
+    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, checker:Int) {
+        if (checker == 0) distortedSprite(spr,a,b,c,d)
+        else if (checker == 1) distortedSpriteChecker(spr,a,b,c,d)
+        else distortedSpriteCheckerB(spr,a,b,c,d)
     }
 
-    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color, checker:Boolean) {
-        if (checker) distortedSpriteChecker(spr,a,b,c,d,ga,gb,gc,gd)
-        else distortedSprite(spr,a,b,c,d,ga,gb,gc,gd)
+    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color, checker:Int) {
+        if (checker == 0) distortedSprite(spr,a,b,c,d,ga,gb,gc,gd)
+        else if (checker == 1) distortedSpriteChecker(spr,a,b,c,d,ga,gb,gc,gd)
+        else distortedSpriteCheckerB(spr,a,b,c,d,ga,gb,gc,gd)
     }
 
     fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
         if (drawing) {
-//            val lf = iterateOverLine(a, d)
-//            val rt = iterateOverLine(b, c)
-            val lf = iterateOverLineGreedy(a, d)
-            val rt = iterateOverLineGreedy(b, c)
+            val lf = iterateOverLine(a, d)
+            val rt = iterateOverLine(b, c)
+//            val lf = iterateOverLineGreedy(a, d)
+//            val rt = iterateOverLineGreedy(b, c)
             val texel = spr.split(1, 1)
 
             batch.color = white
@@ -342,6 +344,10 @@ class QuadDraw {
     }
 
     fun distortedSpriteChecker(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
+
+    }
+
+    fun distortedSpriteCheckerB(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
 
     }
 
