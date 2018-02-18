@@ -1,11 +1,86 @@
 package net.jorhlok.test3d3
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 
+//inspired by https://github.com/Yabause/yabause/blob/master/yabause/src/vidsoft.c
 class QuadDraw {
-    //var buf
-    //var batch
+    var width = 640
+    var height = 360
+    var fbfilter = Texture.TextureFilter.Nearest
+    private val cam = OrthographicCamera(width.toFloat(),height.toFloat())
+    val batch = SpriteBatch()
+    private var fb = FrameBuffer(Pixmap.Format.RGBA8888,1,1,false)
+    private val fbreg = TextureRegion()
+    val px = Texture(1,1,Pixmap.Format.RGBA8888) //for drawing primitives
+    private var drawing = false
+
+    init {
+        val pixel = Pixmap(1,1,Pixmap.Format.RGBA8888)
+        pixel.drawPixel(0,0,Color(1f,1f,1f,1f).toIntBits())
+        px.draw(pixel,0,0)
+        pixel.dispose()
+        mkBuffer()
+    }
+
+    fun mkBuffer() {
+        if (drawing) end()
+        cam.setToOrtho(true,width.toFloat(),height.toFloat())
+        cam.update()
+        fb.dispose()
+        fb = FrameBuffer(Pixmap.Format.RGBA8888,width,height,false)
+        fb.colorBufferTexture.setFilter(fbfilter,fbfilter)
+        fbreg.setRegion(fb.colorBufferTexture)
+    }
+
+    fun dispose() {
+        if (drawing) end()
+        px.dispose()
+        fb.dispose()
+        batch.dispose()
+    }
+
+    fun begin() {
+        if (!drawing) {
+            fb.begin()
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            cam.update()
+            batch.projectionMatrix = cam.combined
+            batch.begin()
+            drawing = true
+        }
+    }
+
+    fun end() {
+        if (drawing) {
+            batch.end()
+            fb.end()
+            drawing = false
+        }
+    }
+
+    fun fbflip() {
+        if (drawing) end()
+        batch.begin()
+        batch.draw(fbreg,0f,0f)
+        batch.end()
+    }
+
+    fun getRegion(): TextureRegion {
+        if (drawing) end()
+        return fbreg
+    }
+
+    fun iterateOverLine(a: Vector2, b: Vector2, greedy: Boolean) : Array<Vector2> {
+        if (greedy) return iterateOverLineGreedy(a,b)
+        else return iterateOverLine(a,b)
+    }
 
     fun iterateOverLine(a: Vector2, b: Vector2) : Array<Vector2> {
         val arr = Array<Vector2>()
@@ -105,7 +180,31 @@ class QuadDraw {
         return arr
     }
 
-    fun quad(a: Vector2, b: Vector2, c: Vector2, d: Vector2) { //mesh, texture
+    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, checker:Boolean) {
+        if (checker) distortedSpriteChecker(spr,a,b,c,d)
+        else distortedSprite(spr,a,b,c,d)
+    }
+
+    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color, checker:Boolean) {
+        if (checker) distortedSpriteChecker(spr,a,b,c,d,ga,gb,gc,gd)
+        else distortedSprite(spr,a,b,c,d,ga,gb,gc,gd)
+    }
+
+    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
 
     }
+
+    fun distortedSpriteChecker(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
+
+    }
+
+    //gouraud shading
+    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
+
+    }
+
+    fun distortedSpriteChecker(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
+
+    }
+
 }
