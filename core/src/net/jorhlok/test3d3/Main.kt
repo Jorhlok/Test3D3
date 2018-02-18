@@ -38,10 +38,10 @@ class Main {
             c.y = Math.random().toFloat()*h
             d.x = Math.random().toFloat()*w
             d.y = Math.random().toFloat()*h
-            val weh = Math.random()
-            if (weh < 0.75) checker = 0
-            else if (weh < 0.75+0.125) checker = 1
-            else checker = 2
+//            val weh = Math.random()
+//            if (weh < 0.75) checker = 0
+//            else if (weh < 0.75+0.125) checker = 1
+//            else checker = 2
         }
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
