@@ -8,17 +8,22 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 
-//inspired by https://github.com/Yabause/yabause/blob/master/yabause/src/vidsoft.c
+/*inspired by https://github.com/Yabause/yabause/blob/master/yabause/src/vidsoft.c
+ *A***B*
+ *     *
+ *D***C*
+ */
 class QuadDraw {
     var width = 640
     var height = 360
     var fbfilter = Texture.TextureFilter.Nearest
     private val cam = OrthographicCamera(width.toFloat(),height.toFloat())
-    val batch = SpriteBatch()
+    private val batch = SpriteBatch()
     private var fb = FrameBuffer(Pixmap.Format.RGBA8888,1,1,false)
     private val fbreg = TextureRegion()
-    val px = Texture(1,1,Pixmap.Format.RGBA8888) //for drawing primitives
+    private val px = Texture(1,1,Pixmap.Format.RGBA8888) //for drawing primitives
     private var drawing = false
+    private val white = Color(1f,1f,1f,1f)
 
     init {
         val pixel = Pixmap(1,1,Pixmap.Format.RGBA8888)
@@ -191,11 +196,144 @@ class QuadDraw {
     }
 
     fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
+        if (drawing) {
+//            val lf = iterateOverLine(a, d)
+//            val rt = iterateOverLine(b, c)
+            val lf = iterateOverLineGreedy(a, d)
+            val rt = iterateOverLineGreedy(b, c)
+            val texel = spr.split(1, 1)
 
+            batch.color = white
+            if (lf.size == rt.size) {
+                for (i in 0 until lf.size) {
+                    val pts = iterateOverLineGreedy(lf[i], rt[i])
+                    val v = Math.round(i.toFloat() / lf.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight-1))
+//                        System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                        batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                    }
+                }
+            } else if (lf.size > rt.size) {
+                for (i in 0 until lf.size) {
+                    val pts = iterateOverLineGreedy(lf[i], rt[Math.round(i.toFloat() / lf.size * (rt.size-1))])
+                    val v = Math.round(i.toFloat() / lf.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight-1))
+//                        System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                        batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                    }
+                }
+            } else {
+                for (i in 0 until rt.size) {
+                    val pts = iterateOverLineGreedy(lf[Math.round(i.toFloat() / rt.size * (lf.size-1))], rt[i])
+                    val v = Math.round(i.toFloat() / rt.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight-1))
+//                        System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                        batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                    }
+                }
+            }
+        }
     }
 
     fun distortedSpriteChecker(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
+        if (drawing) {
+//            val lf = iterateOverLine(a, d)
+//            val rt = iterateOverLine(b, c)
+            val lf = iterateOverLineGreedy(a, d)
+            val rt = iterateOverLineGreedy(b, c)
+            val texel = spr.split(1, 1)
 
+            batch.color = white
+            if (lf.size == rt.size) {
+                for (i in 0 until lf.size) {
+                    val pts = iterateOverLineGreedy(lf[i], rt[i])
+                    val v = Math.round(i.toFloat() / lf.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        if (pts[j].x.toInt() and 1 == pts[j].y.toInt() and 1) { //both even/odd
+                            val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight - 1))
+//                            System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                            batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                        }
+                    }
+                }
+            } else if (lf.size > rt.size) {
+                for (i in 0 until lf.size) {
+                    val pts = iterateOverLineGreedy(lf[i], rt[Math.round(i.toFloat() / lf.size * (rt.size-1))])
+                    val v = Math.round(i.toFloat() / lf.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        if (pts[j].x.toInt() and 1 == pts[j].y.toInt() and 1) { //both even/odd
+                            val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight - 1))
+//                            System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                            batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                        }
+                    }
+                }
+            } else {
+                for (i in 0 until rt.size) {
+                    val pts = iterateOverLineGreedy(lf[Math.round(i.toFloat() / rt.size * (lf.size-1))], rt[i])
+                    val v = Math.round(i.toFloat() / rt.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        if (pts[j].x.toInt() and 1 == pts[j].y.toInt() and 1) { //both even/odd
+                            val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight - 1))
+//                            System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                            batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun distortedSpriteCheckerB(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
+        if (drawing) {
+//            val lf = iterateOverLine(a, d)
+//            val rt = iterateOverLine(b, c)
+            val lf = iterateOverLineGreedy(a, d)
+            val rt = iterateOverLineGreedy(b, c)
+            val texel = spr.split(1, 1)
+
+            batch.color = white
+            if (lf.size == rt.size) {
+                for (i in 0 until lf.size) {
+                    val pts = iterateOverLineGreedy(lf[i], rt[i])
+                    val v = Math.round(i.toFloat() / lf.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        if (pts[j].x.toInt() and 1 != pts[j].y.toInt() and 1) { //not both even/odd
+                            val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight - 1))
+//                            System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                            batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                        }
+                    }
+                }
+            } else if (lf.size > rt.size) {
+                for (i in 0 until lf.size) {
+                    val pts = iterateOverLineGreedy(lf[i], rt[Math.round(i.toFloat() / lf.size * (rt.size-1))])
+                    val v = Math.round(i.toFloat() / lf.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        if (pts[j].x.toInt() and 1 != pts[j].y.toInt() and 1) { //not both even/odd
+                            val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight - 1))
+//                            System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                            batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                        }
+                    }
+                }
+            } else {
+                for (i in 0 until rt.size) {
+                    val pts = iterateOverLineGreedy(lf[Math.round(i.toFloat() / rt.size * (lf.size-1))], rt[i])
+                    val v = Math.round(i.toFloat() / rt.size * (spr.regionWidth-1))
+                    for (j in 0 until pts.size) {
+                        if (pts[j].x.toInt() and 1 != pts[j].y.toInt() and 1) { //not both even/odd
+                            val u = Math.round(j.toFloat() / pts.size * (spr.regionHeight - 1))
+//                            System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
+                            batch.draw(texel[v][u], pts[j].x, pts[j].y)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     //gouraud shading
