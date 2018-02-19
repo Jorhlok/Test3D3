@@ -25,11 +25,11 @@ class Main {
     fun render() {
         val deltatime = Gdx.graphics.deltaTime
         statetime += deltatime
+            val w = 640*2
+            val h = 360*2
 
         if (statetime > 2) {
             statetime = 0f
-            val w = 640
-            val h = 360
             a.x = Math.random().toFloat()*w
             a.y = Math.random().toFloat()*h
             b.x = Math.random().toFloat()*w
@@ -44,19 +44,28 @@ class Main {
 //            else checker = 2
         }
 
+//        val rot = statetime*Math.PI/4
+//        val halfpi = (Math.PI/2).toFloat()
+//        val r = 128f
+//        a.x = (Math.cos(rot)*r+w/2).toFloat()
+//        a.y = (Math.sin(rot)*r+h/2).toFloat()
+//        b.x = (Math.cos(rot+halfpi)*r+w/2).toFloat()
+//        b.y = (Math.sin(rot+halfpi)*r+h/2).toFloat()
+//        c.x = (Math.cos(rot+halfpi*2)*r+w/2).toFloat()
+//        c.y = (Math.sin(rot+halfpi*2)*r+h/2).toFloat()
+//        d.x = (Math.cos(rot+halfpi*3)*r+w/2).toFloat()
+//        d.y = (Math.sin(rot+halfpi*3)*r+h/2).toFloat()
+
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         quadDraw.begin()
         quadDraw.distortedSprite(TextureRegion(img),a,b,c,d,checker)
-        for (i in 0 until 32) {
-            val ws = 640
-            val hs = 360
-            val w = 64
-            val h = 32
-            val x = Math.random().toFloat()*ws
-            val y = Math.random().toFloat()*hs
-//            quadDraw.distortedSprite(TextureRegion(img),Vector2(i.toFloat(),i.toFloat()),Vector2(i.toFloat()+w,i.toFloat()),Vector2(i.toFloat()+w,i.toFloat()+h),Vector2(i.toFloat(),i.toFloat()+h))
-            quadDraw.distortedSprite(TextureRegion(grass),Vector2(Math.random().toFloat()*w+x,Math.random().toFloat()*h+y),Vector2(Math.random().toFloat()*w+x,Math.random().toFloat()*h+y),Vector2(Math.random().toFloat()*w+x,Math.random().toFloat()*h+y),Vector2(Math.random().toFloat()*w+x,Math.random().toFloat()*h+y))
+        for (i in 0 until 128) {
+            val wq = 64
+            val hq = 64
+            val x = Math.random().toFloat()*(w-wq)
+            val y = Math.random().toFloat()*(h-hq)
+            quadDraw.distortedSprite(TextureRegion(grass),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y))
         }
         quadDraw.end()
         quadDraw.fbflip()

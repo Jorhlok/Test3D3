@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.Array
  *D***C*
  */
 class QuadDraw {
-    var width = 640
-    var height = 360
+    var width = 640*2
+    var height = 360*2
     var fbfilter = Texture.TextureFilter.Nearest
     private val cam = OrthographicCamera(width.toFloat(),height.toFloat())
     private val batch = PolygonSpriteBatch()
@@ -91,7 +91,7 @@ class QuadDraw {
 
     fun iterateOverLineA(a: Vector2, b: Vector2) : Array<Vector2> = iterateOverLineGreedy(a,b)
     fun iterateOverLineB(a: Vector2, b: Vector2) : Array<Vector2> = iterateOverLine(a,b)
-    /*AB
+    /*AB    holes?  pixels drawn
     * 00    fail    10201
     * 01    fail    20301
     * 02    good    30401
@@ -282,10 +282,8 @@ class QuadDraw {
 
     fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
         if (drawing) {
-//            val lf = iterateOverLine(a, d)
-//            val rt = iterateOverLine(b, c)
-            val lf = iterateOverLineExtraGreedy(a, d)
-            val rt = iterateOverLineExtraGreedy(b, c)
+            val lf = iterateOverLineGreedy(a, d)
+            val rt = iterateOverLineGreedy(b, c)
             val texel = spr.split(spr.regionWidth, 1)
             batch.color = white
 
@@ -293,11 +291,9 @@ class QuadDraw {
             var rtstep = 1.0
             if (lf.size > rt.size) rtstep = rt.size.toDouble() / lf.size
             else if (rt.size > lf.size) lfstep = lf.size.toDouble() / rt.size
+//            System.out.println(Math.max(lf.size,rt.size))
 
             for (i in 0 until lf.size) {
-//                val pts = iterateOverLineGreedy(lf[(i*lfstep).toInt()], rt[(i*rtstep).toInt()])
-//                val pts = iterateOverLineB(lf[(i*lfstep).toInt()], rt[(i*rtstep).toInt()])
-//                System.out.println("${lf.size}\t${rt.size}\t${pts.size}")
                 val v = Math.round(i.toFloat() / lf.size * (spr.regionHeight-1))
                 val fa = floatArrayOf(0f,0f,spr.regionWidth.toFloat(),0f,spr.regionWidth.toFloat(),1f,0f,1f)
                 val sa = shortArrayOf(0,1,2,0,2,3)
@@ -305,29 +301,51 @@ class QuadDraw {
                 val pt0 = lf[(i*lfstep).toInt()]
                 val pt1 = rt[(i*rtstep).toInt()]
 
-                var greedlf = 0f
-                var greedrt = 0f
-                var greedup = 0f
-                var greeddn = 0f
-                if (pt0.x <= pt1.x) greedrt = 1f
-                else greedlf = -1f
-                if (pt0.y <= pt1.y) greeddn = 1f
-                else greedup = -1f
+                val delta = pt1.cpy().sub(pt0)
 
-                poly.vertices[0] = pt0.x+greedlf
-                poly.vertices[1] = pt0.y+greedup
-                poly.vertices[2] = pt1.x+greedrt
-                poly.vertices[3] = pt1.y+greedup
-                poly.vertices[4] = pt1.x+greedrt
-                poly.vertices[5] = pt1.y+greeddn
-                poly.vertices[6] = pt0.x+greedlf
-                poly.vertices[7] = pt0.y+greeddn
+                if (Math.abs(delta.x) >= Math.abs(delta.y)) {
+                    if (delta.x >= 0) {
+                        poly.vertices[0] = pt0.x
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x+1
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y+1
+                    } else {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x+1
+                        poly.vertices[7] = pt0.y+1
+                    }
+                } else {
+                    if (delta.y >= 0) {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y+1
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y
+                    } else {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y+1
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y+1
+                    }
+                }
+
                 batch.draw(poly,0f,0f)
-//                for (j in 0 until pts.size) {
-//                    val u = Math.round(j.toFloat() / pts.size * (spr.regionWidth-1))
-//                        System.out.println("$u\t$v\t${texel.size}\t${texel[0].size}")
-//                    batch.draw(texel[v][u], pts[j].x, pts[j].y)
-//                }
             }
         }
     }
