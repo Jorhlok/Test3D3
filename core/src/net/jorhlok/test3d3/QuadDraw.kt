@@ -111,8 +111,8 @@ class QuadDraw {
             batch.end()
             fb.end()
             fbcheck.begin()
-            Gdx.gl.glClearColor(0f, 1f, 0f, 1f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+//            Gdx.gl.glClearColor(0f, 1f, 0f, 1f)
+//            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
             batch.begin()
 //            Gdx.gl.glColorMask(true,true,true,true);
 //            Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -149,6 +149,12 @@ class QuadDraw {
 
             drawing = 0
         }
+    }
+
+    fun testChecker() {
+        batch.setBlendFunction(GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA)
+        batch.draw(checkregA,0f,0f)
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA)
     }
 
     fun end() {

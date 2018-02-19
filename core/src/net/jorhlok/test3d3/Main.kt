@@ -71,9 +71,9 @@ class Main {
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         quadDraw.begin()
-        quadDraw.beginChecker()
+//        quadDraw.beginChecker()
         quadDraw.distortedSprite(TextureRegion(img),a,b,c,d,ga,gb,gc,gd)
-        quadDraw.endChecker()
+//        quadDraw.endChecker()
         for (i in 0 until 1){//128) {
             val wq = 64
             val hq = 64
@@ -81,6 +81,7 @@ class Main {
             val y = Math.random().toFloat()*(h-hq)
             quadDraw.distortedSprite(TextureRegion(grass),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y))
         }
+        quadDraw.testChecker()
         quadDraw.end()
         quadDraw.fbflip()
     }
