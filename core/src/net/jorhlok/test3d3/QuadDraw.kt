@@ -27,7 +27,6 @@ class QuadDraw {
     private var fb = FrameBuffer(rgba,1,1,false)
     private val fbreg = TextureRegion()
     private var fbcheck = FrameBuffer(rgba,1,1,false)
-    private val fbcheckreg = TextureRegion()
     private var checktexA = Texture(1,1,rgba)
     private var checktexB = Texture(1,1,rgba)
     private val checkregA = TextureRegion()
@@ -56,7 +55,6 @@ class QuadDraw {
         fbcheck.dispose()
         fbcheck = FrameBuffer(rgba,width,height,false)
         fbcheck.colorBufferTexture.setFilter(nearest,nearest)
-        fbcheckreg.setRegion(fb.colorBufferTexture)
 
         checktexA.dispose()
         checktexB.dispose()
@@ -64,7 +62,7 @@ class QuadDraw {
         val pixmapB = Pixmap(width,height,rgba)
         for (y in 0 until height) {
             for (x in 0 until width) {
-                if ( ((x*checkerSize) and 1) == ((y*checkerSize) and 1) ) pixmapA.drawPixel(x,y,white.toIntBits())
+                if ( ((x/checkerSize) and 1) == ((y/checkerSize) and 1) ) pixmapA.drawPixel(x,y,white.toIntBits())
                 else pixmapB.drawPixel(x,y,white.toIntBits())
             }
         }
@@ -103,58 +101,35 @@ class QuadDraw {
     fun beginChecker(type: Int = 1) {
         var t = type
         if (t > maxChecker) t = maxChecker
+        else if (t < 0) t = 0
+
         if (drawing < 0) begin()
         if (t == 0 && drawing != 0) endChecker()
         else if (drawing != t) {
-            System.out.println("Chubby")
             drawing = t
             batch.end()
             fb.end()
             fbcheck.begin()
-//            Gdx.gl.glClearColor(0f, 1f, 0f, 1f)
-//            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
             batch.begin()
-//            Gdx.gl.glColorMask(true,true,true,true);
-//            Gdx.gl.glEnable(GL20.GL_BLEND);
         }
     }
 
     fun endChecker() {
         if (drawing > 0) {
-            System.out.println("Checker")
-            var tex = checkregB
-            if (drawing == 1) tex = checkregA
-            batch.flush()
-//            batch.color = white.toFloatBits()
-//            Gdx.gl.glColorMask(false,false,false,true);
-//            Gdx.gl.glEnable(GL20.GL_BLEND);
-//            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ZERO);
-//            batch.draw(tex,0f,0f)
-            batch.draw(px,0f,0f)
+            var mask = checkregB
+            if (drawing == 1) mask = checkregA
+            batch.setBlendFunction(GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA) //if src is blank add src, else add dst (mask off pixels)
+            batch.draw(mask,0f,0f)
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA) //if src is opaque add src, else add dst (normal)
             batch.end()
             fbcheck.end()
-//            fb.begin()
-            batch.begin()
-//            Gdx.gl.glColorMask(true,true,true,true);
-//            Gdx.gl.glEnable(GL20.GL_BLEND);
-//            Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ZERO);
-//            batch.draw(fbcheckreg,0f,0f)
-
-            batch.end()
             fb.begin()
             batch.begin()
-            batch.draw(px,1f,1f)
-            batch.draw(fbcheckreg,0f,0f)
-//            batch.draw(checkregB,0f,0f)
-
+            batch.draw(fbcheck.colorBufferTexture,0f,0f)
             drawing = 0
         }
-    }
-
-    fun testChecker() {
-        batch.setBlendFunction(GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA)
-        batch.draw(checkregA,0f,0f)
-        batch.setBlendFunction(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA)
     }
 
     fun end() {

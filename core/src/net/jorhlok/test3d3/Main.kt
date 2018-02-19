@@ -14,9 +14,9 @@ class Main {
     val grass = Texture("ISLAND01.png")
     var statetime = 0f
     val a = Vector2()
-    val b = Vector2(64f,0f)
-    val c = Vector2(64f,64f)
-    val d = Vector2(0f,64f)
+    val b = Vector2(63f,0f)
+    val c = Vector2(63f,63f)
+    val d = Vector2(0f,63f)
     var ga = Color(1f,0f,0f,1f)
     var gb = Color(1f,1f,0f,1f)
     var gc = Color(0f,0f,1f,1f)
@@ -25,13 +25,17 @@ class Main {
 
 
     fun create() {
+        quadDraw.checkerSize = 2
+        quadDraw.width = 1280
+        quadDraw.height = 720
+        quadDraw.mkBuffer()
     }
 
     fun render() {
         val deltatime = Gdx.graphics.deltaTime
         statetime += deltatime
-            val w = 640//*2
-            val h = 360//*2
+            val w = 640*2
+            val h = 360*2
 
         if (statetime > 2) {
             statetime = 0f
@@ -71,17 +75,16 @@ class Main {
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         quadDraw.begin()
-//        quadDraw.beginChecker()
-        quadDraw.distortedSprite(TextureRegion(img),a,b,c,d,ga,gb,gc,gd)
-//        quadDraw.endChecker()
-        for (i in 0 until 1){//128) {
+        for (i in 0 until 128) {
             val wq = 64
             val hq = 64
             val x = Math.random().toFloat()*(w-wq)
             val y = Math.random().toFloat()*(h-hq)
             quadDraw.distortedSprite(TextureRegion(grass),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y))
         }
-        quadDraw.testChecker()
+        quadDraw.beginChecker()
+        quadDraw.distortedSprite(TextureRegion(img),a,b,c,d,ga,gb,gc,gd)
+        quadDraw.endChecker()
         quadDraw.end()
         quadDraw.fbflip()
     }
