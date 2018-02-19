@@ -2,10 +2,7 @@ package net.jorhlok.test3d3
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.PolygonRegion
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
@@ -20,7 +17,7 @@ class QuadDraw {
     var height = 360*2
     var fbfilter = Texture.TextureFilter.Nearest
     private val cam = OrthographicCamera(width.toFloat(),height.toFloat())
-    private val batch = PolygonSpriteBatch()
+    private val batch = MultiColorPolygonSpriteBatch()
     private var fb = FrameBuffer(Pixmap.Format.RGBA8888,1,1,false)
     private val fbreg = TextureRegion()
     private val px = Texture(1,1,Pixmap.Format.RGBA8888) //for drawing primitives
@@ -285,7 +282,7 @@ class QuadDraw {
             val lf = iterateOverLineGreedy(a, d)
             val rt = iterateOverLineGreedy(b, c)
             val texel = spr.split(spr.regionWidth, 1)
-            batch.color = white
+            batch.color = white.toFloatBits()
 
             var lfstep = 1.0
             var rtstep = 1.0
@@ -344,6 +341,8 @@ class QuadDraw {
                         poly.vertices[7] = pt0.y+1
                     }
                 }
+//                val polyspr = PolygonSprite(poly)
+//                polyspr.
 
                 batch.draw(poly,0f,0f)
             }
@@ -386,7 +385,7 @@ class QuadDraw {
             val rt = iterateOverLineA(b, c)
             val texel = spr.split(1, 1)
 
-            batch.color = white
+            batch.color = white.toFloatBits()
 
             var lfstep = 1.0
             var rtstep = 1.0
@@ -415,7 +414,7 @@ class QuadDraw {
             val rt = iterateOverLineA(b, c)
             val texel = spr.split(1, 1)
 
-            batch.color = white
+            batch.color = white.toFloatBits()
 
             var lfstep = 1.0
             var rtstep = 1.0
