@@ -188,6 +188,46 @@ class MultiColorPolygonSpriteBatch : Batch {
         this.vertexIndex = vertexIndex
     }
 
+    /** Draws a polygon region with the bottom left corner at x,y having the width and height of the region.  */
+    fun draw(region: PolygonRegion, x: Float, y: Float, cols: FloatArray) {
+        if (!drawing) throw IllegalStateException("PolygonSpriteBatch.begin must be called before draw.")
+
+        val triangles = this.triangles
+        val regionTriangles = region.triangles
+        val regionTrianglesLength = regionTriangles.size
+        val regionVertices = region.vertices
+        val regionVerticesLength = regionVertices.size
+
+        val texture = region.region.texture
+        if (texture !== lastTexture)
+            switchTexture(texture)
+        else if (triangleIndex + regionTrianglesLength > triangles.size || vertexIndex + regionVerticesLength * VERTEX_SIZE / 2 > vertices.size)
+            flush()
+
+        var triangleIndex = this.triangleIndex
+        var vertexIndex = this.vertexIndex
+        val startVertex = vertexIndex / VERTEX_SIZE
+
+        for (i in 0 until regionTrianglesLength)
+            triangles[triangleIndex++] = (regionTriangles[i] + startVertex).toShort()
+        this.triangleIndex = triangleIndex
+
+        val vertices = this.vertices
+        //val color = this.color
+        val textureCoords = region.textureCoords
+
+        var i = 0
+        while (i < regionVerticesLength) {
+            vertices[vertexIndex++] = regionVertices[i] + x
+            vertices[vertexIndex++] = regionVertices[i + 1] + y
+            vertices[vertexIndex++] = cols[i%cols.size]
+            vertices[vertexIndex++] = textureCoords[i]
+            vertices[vertexIndex++] = textureCoords[i + 1]
+            i += 2
+        }
+        this.vertexIndex = vertexIndex
+    }
+
     /** Draws a polygon region with the bottom left corner at x,y and stretching the region to cover the given width and height.  */
     fun draw(region: PolygonRegion, x: Float, y: Float, width: Float, height: Float) {
         if (!drawing) throw IllegalStateException("PolygonSpriteBatch.begin must be called before draw.")
