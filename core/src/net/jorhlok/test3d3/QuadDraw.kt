@@ -102,10 +102,9 @@ class QuadDraw {
     fun beginChecker(type: Int = 1) {
         var t = type
         if (t > maxChecker) t = maxChecker
-        else if (t < 0) t = 0
 
         if (drawing < 0) begin()
-        if (t == 0 && drawing != 0) endChecker()
+        if (t == 0 && drawing > 0) endChecker()
         else if (drawing != t) {
             drawing = t
             batch.end()
@@ -153,6 +152,8 @@ class QuadDraw {
         if (drawing >= 0) end()
         return fbreg
     }
+
+    fun getDrawMode() = drawing
 
     fun iterateOverLine(a: Vector2, b: Vector2) : Array<Vector2> {
         val arr = Array<Vector2>()
@@ -260,7 +261,7 @@ class QuadDraw {
         return arr
     }
 
-    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2) {
+    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, col:Color = white) {
         if (drawing >= 0) {
             val lf = iterateOverLineGreedy(a, d)
             val rt = iterateOverLineGreedy(b, c)
@@ -282,6 +283,77 @@ class QuadDraw {
                 val fa = floatArrayOf(0f,0f,spr.regionWidth.toFloat(),0f,spr.regionWidth.toFloat(),1f,0f,1f)
                 val sa = shortArrayOf(0,1,2,0,2,3)
                 val poly = PolygonRegion(texel[v][0], fa, sa)
+                val pt0 = lf[(i*lfstep).toInt()]
+                val pt1 = rt[(i*rtstep).toInt()]
+
+                val delta = pt1.cpy().sub(pt0)
+
+                if (Math.abs(delta.x) >= Math.abs(delta.y)) {
+                    if (delta.x >= 0) {
+                        poly.vertices[0] = pt0.x
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x+1
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y+1
+                    } else {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x+1
+                        poly.vertices[7] = pt0.y+1
+                    }
+                } else {
+                    if (delta.y >= 0) {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y+1
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y
+                    } else {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y+1
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y+1
+                    }
+                }
+                batch.draw(poly,0f,0f)
+            }
+        }
+    }
+
+    fun distortedQuad(a: Vector2, b: Vector2, c: Vector2, d: Vector2, col:Color = white) {
+        if (drawing >= 0) {
+            val lf = iterateOverLineGreedy(a, d)
+            val rt = iterateOverLineGreedy(b, c)
+            batch.color = col.toFloatBits()
+
+            var lfstep = 1.0
+            var rtstep = 1.0
+            var total = lf.size
+            if (lf.size > rt.size) rtstep = rt.size.toDouble() / lf.size
+            else if (rt.size > lf.size) {
+                lfstep = lf.size.toDouble() / rt.size
+                total = rt.size
+            }
+
+            for (i in 0 until total) {
+                val v = Math.round(i.toFloat() / total)
+                val fa = floatArrayOf(0f,0f,1f,0f,1f,1f,0f,1f)
+                val sa = shortArrayOf(0,1,2,0,2,3)
+                val poly = PolygonRegion(TextureRegion(px), fa, sa)
                 val pt0 = lf[(i*lfstep).toInt()]
                 val pt1 = rt[(i*rtstep).toInt()]
 
@@ -359,6 +431,85 @@ class QuadDraw {
                 val fa = floatArrayOf(0f,0f,spr.regionWidth.toFloat(),0f,spr.regionWidth.toFloat(),1f,0f,1f)
                 val sa = shortArrayOf(0,1,2,0,2,3)
                 val poly = PolygonRegion(texel[v][0], fa, sa)
+                val pt0 = lf[(i*lfstep).toInt()]
+                val pt1 = rt[(i*rtstep).toInt()]
+
+                val delta = pt1.cpy().sub(pt0)
+
+                if (Math.abs(delta.x) >= Math.abs(delta.y)) {
+                    if (delta.x >= 0) {
+                        poly.vertices[0] = pt0.x
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x+1
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y+1
+                    } else {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x+1
+                        poly.vertices[7] = pt0.y+1
+                    }
+                } else {
+                    if (delta.y >= 0) {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y+1
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y+1
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y
+                    } else {
+                        poly.vertices[0] = pt0.x+1
+                        poly.vertices[1] = pt0.y+1
+                        poly.vertices[2] = pt1.x+1
+                        poly.vertices[3] = pt1.y
+                        poly.vertices[4] = pt1.x
+                        poly.vertices[5] = pt1.y
+                        poly.vertices[6] = pt0.x
+                        poly.vertices[7] = pt0.y+1
+                    }
+                }
+
+                val col0 = Color(ga.r+lfcolstep.x*i,ga.g+lfcolstep.y*i,ga.b+lfcolstep.z*i,1f).toFloatBits()
+                val col1 = Color(gb.r+rtcolstep.x*i,gb.g+rtcolstep.y*i,gb.b+rtcolstep.z*i,1f).toFloatBits()
+
+                batch.draw(poly,0f,0f, floatArrayOf(col0,col1,col1,col0,col1,col0))
+            }
+        }
+    }
+
+    fun distortedQuad(a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
+        if (drawing >= 0) {
+            val lf = iterateOverLineGreedy(a, d)
+            val rt = iterateOverLineGreedy(b, c)
+            batch.color = white.toFloatBits()
+
+            var lfstep = 1.0
+            var rtstep = 1.0
+            var total = lf.size
+            if (lf.size > rt.size) rtstep = rt.size.toDouble() / lf.size
+            else if (rt.size > lf.size) {
+                lfstep = lf.size.toDouble() / rt.size
+                total = rt.size
+            }
+//            System.out.println(Math.max(lf.size,rt.size))
+
+            val lfcolstep = Vector3((gd.r-ga.r)/total,(gd.g-ga.g)/total,(gd.b-ga.b)/total)
+            val rtcolstep = Vector3((gc.r-gb.r)/total,(gc.g-gb.g)/total,(gc.b-gb.b)/total)
+
+            for (i in 0 until total) {
+                val v = Math.round(i.toFloat() / total)
+                val fa = floatArrayOf(0f,0f,1f,0f,1f,1f,0f,1f)
+                val sa = shortArrayOf(0,1,2,0,2,3)
+                val poly = PolygonRegion(TextureRegion(px), fa, sa)
                 val pt0 = lf[(i*lfstep).toInt()]
                 val pt1 = rt[(i*rtstep).toInt()]
 

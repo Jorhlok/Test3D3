@@ -15,24 +15,12 @@ class Main {
     val img = Texture("badlogic.jpg")
     val grass = Texture("ISLAND01.png")
     var statetime = 0f
-    val a = Vector2()
-    val b = Vector2(63f,0f)
-    val c = Vector2(63f,63f)
-    val d = Vector2(0f,63f)
-    var ga = Color(1f,0f,0f,1f)
-    var gb = Color(1f,1f,0f,1f)
-    var gc = Color(0f,0f,1f,1f)
-    var gd = Color(0f,1f,0f,1f)
-    var checker = 0
 
-    val w = 640*2
-    val h = 360*2
+    val w = 640//*2
+    val h = 360//*2
     val cam = PerspectiveCamera(66.6666667f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     val camController = FPControllerCamera(cam)
-    val pa = Vector3(-1f,-1f,0f)
-    val pb = Vector3(1f,-1f,0f)
-    val pc = Vector3(1f,1f,0f)
-    val pd = Vector3(-1f,1f,0f)
+    val renderer = Quad3DRender(cam,quadDraw)
 
 
     fun create() {
@@ -40,8 +28,34 @@ class Main {
         cam.translate(0f,0f,-10f)
         cam.lookAt(0f,0f,0f)
         cam.near = 1/64f
-        cam.far = 1024f
+        cam.far = 128f
         cam.update()
+
+        renderer.quads.add(RenderableQuad())
+        renderer.quads.last().tex.setRegion(img)
+        renderer.quads.last().vertex[0].set(-1f,-1f,0f)
+        renderer.quads.last().vertex[1].set(1f,-1f,0f)
+        renderer.quads.last().vertex[2].set(1f,1f,0f)
+        renderer.quads.last().vertex[3].set(-1f,1f,0f)
+
+        renderer.quads.add(RenderableQuad())
+        renderer.quads.last().checker = 1
+        renderer.quads.last().color[0].set(1f,0f,0f,1f)
+        renderer.quads.last().color[1].set(0f,0.5f,0f,1f)
+        renderer.quads.last().color[2].set(0f,0f,1f,1f)
+        renderer.quads.last().color[3].set(1f,1f,0f,1f)
+        renderer.quads.last().vertex[0].set(-2f,-2f,-2f)
+        renderer.quads.last().vertex[1].set(2f,-2f,-2f)
+        renderer.quads.last().vertex[2].set(2f,2f,-2f)
+        renderer.quads.last().vertex[3].set(-2f,2f,-2f)
+
+        renderer.quads.add(RenderableQuad())
+        renderer.quads.last().tex.setRegion(grass)
+        renderer.quads.last().vertex[0].set(-1f,-1f,2f)
+        renderer.quads.last().vertex[1].set(1f,-1f,2f)
+        renderer.quads.last().vertex[2].set(1f,1f,2f)
+        renderer.quads.last().vertex[3].set(-1f,1f,2f)
+
 
         quadDraw.checkerSize = 1
         quadDraw.width = w
@@ -55,25 +69,13 @@ class Main {
 
         camController.update(deltatime)
         cam.update()
-        val scalar = Vector3(-1f,1f,1f)
-        val sa = cam.project(pa.cpy().scl(scalar))
-        val sb = cam.project(pb.cpy().scl(scalar))
-        val sc = cam.project(pc.cpy().scl(scalar))
-        val sd = cam.project(pd.cpy().scl(scalar))
-
-        val wr = w/cam.viewportWidth
-        val hr = h/cam.viewportHeight
-        a.set(sa.x*wr,sa.y*hr)
-        b.set(sb.x*wr,sb.y*hr)
-        c.set(sc.x*wr,sc.y*hr)
-        d.set(sd.x*wr,sd.y*hr)
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         quadDraw.begin()
-//        quadDraw.beginChecker()
-        quadDraw.distortedSprite(TextureRegion(img),a,b,c,d)
-//        quadDraw.endChecker()
+
+        renderer.render()
+
         quadDraw.end()
         quadDraw.fbflip()
     }
