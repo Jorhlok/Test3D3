@@ -41,7 +41,7 @@ class MultiColorPolygonSpriteBatch : Batch {
     val VERTEX_SIZE = 5
     val SPRITE_SIZE = 4 * VERTEX_SIZE
 
-    /** Number of render calls since the last [.begin].  */
+    /** Number of prjRender calls since the last [.begin].  */
     var renderCalls = 0
 
     /** Number of rendering calls, ever. Will not be reset unless set manually.  */

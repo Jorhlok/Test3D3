@@ -127,14 +127,14 @@ class FPControllerCamera(private val camera: Camera) : InputAdapter() {
                 }
 
                 when (cont.getPov(0)) {
-                    PovDirection.north -> DPAD.add(0f,-deltaTime)
-                    PovDirection.northEast -> DPAD.add(deltaTime,-deltaTime)
+                    PovDirection.north -> DPAD.add(0f,deltaTime)
+                    PovDirection.northEast -> DPAD.add(deltaTime,deltaTime)
                     PovDirection.east -> DPAD.add(deltaTime,0f)
-                    PovDirection.southEast -> DPAD.add(deltaTime,deltaTime)
-                    PovDirection.south -> DPAD.add(0f,deltaTime)
-                    PovDirection.southWest -> DPAD.add(-deltaTime,deltaTime)
+                    PovDirection.southEast -> DPAD.add(deltaTime,-deltaTime)
+                    PovDirection.south -> DPAD.add(0f,-deltaTime)
+                    PovDirection.southWest -> DPAD.add(-deltaTime,-deltaTime)
                     PovDirection.west -> DPAD.add(-deltaTime,0f)
-                    PovDirection.northWest -> DPAD.add(-deltaTime,-deltaTime)
+                    PovDirection.northWest -> DPAD.add(-deltaTime,deltaTime)
                 //else -> {}//nothing
                 }
             }

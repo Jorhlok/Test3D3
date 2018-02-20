@@ -8,7 +8,7 @@ class RenderableQuad {
     val vertex = Array(4,{ Vector3() })
     val color = Array(4,{ Color(1f,1f,1f,1f) })
     var tex = TextureRegion()
-    var checker = 0
+    var checker: Byte = 0
 
     class SortByMaxZ : Comparator<RenderableQuad> {
         override fun compare(a: RenderableQuad?, b: RenderableQuad?): Int {
