@@ -25,9 +25,9 @@ class Main {
     var gd = Color(0f,1f,0f,1f)
     var checker = 0
 
-    val w = 640//*2
-    val h = 360//*2
-    val cam = PerspectiveCamera(67f, w.toFloat(), h.toFloat())
+    val w = 640*2
+    val h = 360*2
+    val cam = PerspectiveCamera(66.6666667f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     val camController = FPControllerCamera(cam)
     val pa = Vector3(-1f,-1f,0f)
     val pb = Vector3(1f,-1f,0f)
@@ -61,55 +61,12 @@ class Main {
         val sc = cam.project(pc.cpy().scl(scalar))
         val sd = cam.project(pd.cpy().scl(scalar))
 
-//        a.set(sa.x-w*1.5f,sa.y-h*1.5f)
-//        b.set(sb.x-w*1.5f,sb.y-h*1.5f)
-//        c.set(sc.x-w*1.5f,sc.y-h*1.5f)
-//        d.set(sd.x-w*1.5f,sd.y-h*1.5f)
-
-        a.set(sa.x-w/2,sa.y-h/2)
-        b.set(sb.x-w/2,sb.y-h/2)
-        c.set(sc.x-w/2,sc.y-h/2)
-        d.set(sd.x-w/2,sd.y-h/2)
-
-//        a.set(sa.x,sa.y)
-//        b.set(sb.x,sb.y)
-//        c.set(sc.x,sc.y)
-//        d.set(sd.x,sd.y)
-
-//        if (statetime > 2) {
-//            statetime = 0f
-//            a.x = Math.random().toFloat()*w
-//            a.y = Math.random().toFloat()*h
-//            b.x = Math.random().toFloat()*w
-//            b.y = Math.random().toFloat()*h
-//            c.x = Math.random().toFloat()*w
-//            c.y = Math.random().toFloat()*h
-//            d.x = Math.random().toFloat()*w
-//            d.y = Math.random().toFloat()*h
-//
-//            ga = Color(Math.random().toFloat(),Math.random().toFloat(),Math.random().toFloat(),1f)
-//            gb = Color(Math.random().toFloat(),Math.random().toFloat(),Math.random().toFloat(),1f)
-//            gc = Color(Math.random().toFloat(),Math.random().toFloat(),Math.random().toFloat(),1f)
-//            gd = Color(Math.random().toFloat(),Math.random().toFloat(),Math.random().toFloat(),1f)
-//
-//            val weh = Math.random()
-//            if (weh < 0.5) checker = 0
-//            else if (weh < 0.75) checker = 1
-//            else checker = 2
-//        }
-
-//        val rot = statetime*Math.PI/4
-//        val halfpi = (Math.PI/2).toFloat()
-//        val r = 128f
-//        a.x = (Math.cos(rot)*r+w/2).toFloat()
-//        a.y = (Math.sin(rot)*r+h/2).toFloat()
-//        b.x = (Math.cos(rot+halfpi)*r+w/2).toFloat()
-//        b.y = (Math.sin(rot+halfpi)*r+h/2).toFloat()
-//        c.x = (Math.cos(rot+halfpi*2)*r+w/2).toFloat()
-//        c.y = (Math.sin(rot+halfpi*2)*r+h/2).toFloat()
-//        d.x = (Math.cos(rot+halfpi*3)*r+w/2).toFloat()
-//        d.y = (Math.sin(rot+halfpi*3)*r+h/2).toFloat()
-
+        val wr = w/cam.viewportWidth
+        val hr = h/cam.viewportHeight
+        a.set(sa.x*wr,sa.y*hr)
+        b.set(sb.x*wr,sb.y*hr)
+        c.set(sc.x*wr,sc.y*hr)
+        d.set(sd.x*wr,sd.y*hr)
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -117,23 +74,6 @@ class Main {
 //        quadDraw.beginChecker()
         quadDraw.distortedSprite(TextureRegion(img),a,b,c,d)
 //        quadDraw.endChecker()
-//        for (i in 0 until 64) {
-//            val wq = 64
-//            val hq = 64
-//            val x = Math.random().toFloat()*(w-wq)
-//            val y = Math.random().toFloat()*(h-hq)
-//            quadDraw.distortedSprite(TextureRegion(grass),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y))
-//        }
-//        quadDraw.beginChecker(checker)
-//        quadDraw.distortedSprite(TextureRegion(img),a,b,c,d,ga,gb,gc,gd)
-//        quadDraw.endChecker()
-//        for (i in 0 until 64) {
-//            val wq = 64
-//            val hq = 64
-//            val x = Math.random().toFloat()*(w-wq)
-//            val y = Math.random().toFloat()*(h-hq)
-//            quadDraw.distortedSprite(TextureRegion(grass),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y),Vector2(Math.random().toFloat()*wq+x,Math.random().toFloat()*hq+y))
-//        }
         quadDraw.end()
         quadDraw.fbflip()
     }
