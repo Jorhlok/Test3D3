@@ -66,7 +66,7 @@ class FPControllerCamera(private val camera: Camera) : InputAdapter() {
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         val deltaX = -Gdx.input.deltaX * degreesPerPixel
-        val deltaY = -Gdx.input.deltaY * degreesPerPixel
+        val deltaY = Gdx.input.deltaY * degreesPerPixel
 //        camera.direction.rotate(camera.up, deltaX)
         tmp.set(camera.direction).crs(camera.up).nor()
         camera.direction.rotate(tmp, deltaY)
@@ -99,7 +99,7 @@ class FPControllerCamera(private val camera: Camera) : InputAdapter() {
 //                System.out.println("$axis0\t$axis1\t$axis2\t$axis3")
 
                 val deltaX = -axis3 * joylook
-                val deltaY = -axis2 * joylook
+                val deltaY = axis2 * joylook
                 if (!(axis2 == 0f && axis3 == 0f)) {
 //            camera.direction.rotate(camera.up, deltaX)
                     tmp.set(camera.direction).crs(camera.up).nor()
@@ -107,34 +107,34 @@ class FPControllerCamera(private val camera: Camera) : InputAdapter() {
                     camera.rotate(deltaX, 0f, 1f, 0f)
                 }
 
-                if (axis0 != 0f) {
-                    tmp.set(camera.direction).nor().scl(deltaTime * joyvelocity * -axis0)
+                if (axis0 != 0f) { //vertical
+                    tmp.set(camera.direction).nor().scl(-deltaTime * joyvelocity * axis0)
                     camera.position.add(tmp)
                 }
 
-                if (axis1 != 0f) {
+                if (axis1 != 0f) { //horizontal
                     tmp.set(camera.direction).crs(camera.up).nor().scl(deltaTime * joyvelocity * axis1)
                     camera.position.add(tmp)
                 }
 
                 if (cont.getButton(0)) {
-                    tmp.set(camera.up).nor().scl(deltaTime * velocity)
+                    tmp.set(camera.up).nor().scl(-deltaTime * velocity)
                     camera.position.add(tmp)
                 }
                 if (cont.getButton(1)) {
-                    tmp.set(camera.up).nor().scl(-deltaTime * velocity)
+                    tmp.set(camera.up).nor().scl(deltaTime * velocity)
                     camera.position.add(tmp)
                 }
 
                 when (cont.getPov(0)) {
-                    PovDirection.north -> DPAD.add(0f,deltaTime)
-                    PovDirection.northEast -> DPAD.add(deltaTime,deltaTime)
+                    PovDirection.north -> DPAD.add(0f,-deltaTime)
+                    PovDirection.northEast -> DPAD.add(deltaTime,-deltaTime)
                     PovDirection.east -> DPAD.add(deltaTime,0f)
-                    PovDirection.southEast -> DPAD.add(deltaTime,-deltaTime)
-                    PovDirection.south -> DPAD.add(0f,-deltaTime)
-                    PovDirection.southWest -> DPAD.add(-deltaTime,-deltaTime)
+                    PovDirection.southEast -> DPAD.add(deltaTime,deltaTime)
+                    PovDirection.south -> DPAD.add(0f,deltaTime)
+                    PovDirection.southWest -> DPAD.add(-deltaTime,deltaTime)
                     PovDirection.west -> DPAD.add(-deltaTime,0f)
-                    PovDirection.northWest -> DPAD.add(-deltaTime,deltaTime)
+                    PovDirection.northWest -> DPAD.add(-deltaTime,-deltaTime)
                 //else -> {}//nothing
                 }
             }
@@ -159,11 +159,11 @@ class FPControllerCamera(private val camera: Camera) : InputAdapter() {
         }
 
         if (keys.containsKey(UP)) {
-            tmp.set(camera.up).nor().scl(deltaTime * velocity)
+            tmp.set(camera.up).nor().scl(-deltaTime * velocity)
             camera.position.add(tmp)
         }
         if (keys.containsKey(DOWN)) {
-            tmp.set(camera.up).nor().scl(-deltaTime * velocity)
+            tmp.set(camera.up).nor().scl(deltaTime * velocity)
             camera.position.add(tmp)
         }
 
