@@ -23,6 +23,7 @@ class Main {
     val renderer = Quad3DRender(cam,quadDraw)
     val mesh = QuadMesh()
     val mesh2 = QuadMesh()
+    val cube = QuadMesh()
     val cursor = Vector2()
 
 
@@ -61,6 +62,8 @@ class Main {
         mesh.sprite.add(TextureRegion(grass))
         mesh.index.add(8,9,10,11)
 
+        mesh.matrix.translate(0f,0f,10f)
+
 
         mesh2.vertex.add(Vector3(0f,0f,0f))
         mesh2.vertex.add(Vector3(-0.25f,-0.75f,-0.25f))
@@ -94,6 +97,36 @@ class Main {
 //        mesh2.checker.add(2)
 
 
+        cube.vertex.add(Vector3(-1f,-1f,-1f))
+        cube.vertex.add(Vector3(1f,-1f,-1f))
+        cube.vertex.add(Vector3(1f,1f,-1f))
+        cube.vertex.add(Vector3(-1f,1f,-1f))
+        cube.vertex.add(Vector3(-1f,-1f,1f))
+        cube.vertex.add(Vector3(1f,-1f,1f))
+        cube.vertex.add(Vector3(1f,1f,1f))
+        cube.vertex.add(Vector3(-1f,1f,1f))
+        cube.index.add(0,1,2,3) //front
+        cube.index.add(1,5,6,2) //right
+        cube.index.add(5,4,7,6) //back
+        cube.index.add(4,0,3,7) //left
+        cube.index.add(4,5,1,0) //top
+        cube.index.add(6,7,3,2) //bottom
+        cube.type.add(0,0,0)
+        cube.type.add(0,0,0)
+//        cube.checker.add(2,2,2)
+//        cube.checker.add(2,2,2)
+        cube.lit.add(true,true,true)
+        cube.lit.add(true,true,true)
+//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
+//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
+//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
+//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
+//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
+//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
+
+        cube.calcNormals()
+
+
         quadDraw.checkerSize = 1
         quadDraw.width = w
         quadDraw.height = h
@@ -109,7 +142,11 @@ class Main {
 
         mesh.matrix.rotate(0f,1f,0f,deltatime*32)
         cursor.add(camController.dpad)
-        mesh2.matrix.setToTranslation(cursor.x,0f,cursor.y).rotate(0f,1f,0f,statetime*128)
+        mesh2.matrix.setToTranslation(cursor.x,0f,cursor.y).rotate(0f,1f,0f,statetime*180)
+        cube.matrix.setToRotation(Vector3(1f,0.75f,-0.25f).nor(),-statetime*45)
+        cube.unlight()
+        cube.lightAmbient(Color(0.25f,0.25f,0.25f,1f))
+        cube.lightDir(Color(1f,1f,1f,1f),Vector3(1f,1f,1f).nor())
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -119,6 +156,7 @@ class Main {
 
         mesh.trnsPrjAdd(renderer)
         mesh2.trnsPrjAdd(renderer)
+        cube.trnsPrjLightAdd(renderer)
         renderer.render()
 
         renderer.end()
