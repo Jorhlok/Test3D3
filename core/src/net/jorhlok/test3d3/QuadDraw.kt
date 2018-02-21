@@ -14,6 +14,18 @@ import com.badlogic.gdx.utils.Array
  *D***C*
  */
 class QuadDraw {
+
+    enum class Type {
+        DistortedSprite,
+        DistortedQuad,
+        ScaledSprite,
+        ScaledQuad,
+        Sprite,
+        PolyLines,
+        Line,
+        Point
+    }
+
     var width = 640//*2
     var height = 360//*2
     var fbfilter = Texture.TextureFilter.Nearest
