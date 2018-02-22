@@ -155,8 +155,8 @@ class Main {
         mesh.trnsPrjAdd(renderer)
         mesh2.trnsPrjAdd(renderer)
         cube.trnsPrjLightAdd(renderer)
-
         renderer.render()
+
         quadDraw.end()
         quadDraw.fbflip()
     }

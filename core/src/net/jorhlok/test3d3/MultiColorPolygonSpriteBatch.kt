@@ -220,7 +220,7 @@ class MultiColorPolygonSpriteBatch : Batch {
         while (i < regionVerticesLength) {
             vertices[vertexIndex++] = regionVertices[i] + x
             vertices[vertexIndex++] = regionVertices[i + 1] + y
-            vertices[vertexIndex++] = cols[i%cols.size]
+            vertices[vertexIndex++] = cols[(i/2)%cols.size]
             vertices[vertexIndex++] = textureCoords[i]
             vertices[vertexIndex++] = textureCoords[i + 1]
             i += 2
