@@ -17,7 +17,7 @@ class Main {
 
     val w = 640//*2
     val h = 360//*2
-    val cam = PerspectiveCamera(40f, w.toFloat(), h.toFloat())
+    val cam = PerspectiveCamera(66.666667f, w.toFloat(), h.toFloat())
     val camController = FPControllerCamera(cam)
     val quadDraw = QuadDraw()
     val renderer = Quad3DRender(cam,quadDraw)
@@ -35,6 +35,7 @@ class Main {
         cam.near = 1/64f
         cam.far = 128f
         cam.update()
+        renderer.camOverscan = 1.5f //0.125f
 
         mesh.vertex.add(Vector3(-2f,-3f,-2f))
         mesh.vertex.add(Vector3(2f,-1f,-2f))
@@ -111,10 +112,10 @@ class Main {
         cube.index.add(4,0,3,7) //left
         cube.index.add(4,5,1,0) //top
         cube.index.add(6,7,3,2) //bottom
-        cube.type.add(0,0,0)
-        cube.type.add(0,0,0)
-//        cube.checker.add(2,2,2)
-//        cube.checker.add(2,2,2)
+//        cube.type.add(0,0,0)
+//        cube.type.add(0,0,0)
+//        cube.checker.add(1,1,1)
+//        cube.checker.add(1,1,1)
         cube.lit.add(true,true,true)
         cube.lit.add(true,true,true)
 //        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
@@ -123,9 +124,7 @@ class Main {
 //        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
 //        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
 //        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
-
         cube.calcNormals()
-
 
         quadDraw.checkerSize = 1
         quadDraw.width = w
@@ -152,14 +151,12 @@ class Main {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         quadDraw.begin()
         renderer.clear()
-        renderer.begin()
 
         mesh.trnsPrjAdd(renderer)
         mesh2.trnsPrjAdd(renderer)
         cube.trnsPrjLightAdd(renderer)
-        renderer.render()
 
-        renderer.end()
+        renderer.render()
         quadDraw.end()
         quadDraw.fbflip()
     }
