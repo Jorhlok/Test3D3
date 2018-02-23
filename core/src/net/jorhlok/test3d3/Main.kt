@@ -158,9 +158,6 @@ class Main {
         cube.trnsPrjLightAdd(renderer)
         renderer.render()
 
-        quadDraw.endChecker()
-        font.drawString(quadDraw,"Hello, World!\n\tweh")
-
         quadDraw.end()
         quadDraw.fbflip()
     }

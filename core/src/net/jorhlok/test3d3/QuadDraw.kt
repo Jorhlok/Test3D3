@@ -282,6 +282,12 @@ class QuadDraw {
 
     fun sprite(spr: TextureRegion, a: Vector2, col:Color = white) { sprite(spr,a,col,col,col,col) }
 
+    fun line(a: Vector2, b: Vector2, col:Color = white) { line(a,b,col,col) }
+
+    fun polyLines(a: Vector2, b: Vector2, c: Vector2, d: Vector2, col:Color = white) { polyLines(a,b,c,d,col) }
+
+    fun point(a: Vector2, col: Color = white) { sprite(TextureRegion(px),a,col) }
+
     //gouraud shading
     fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
         if (drawing >= 0) {
@@ -486,6 +492,69 @@ class QuadDraw {
             poly.vertices[7] = 0f
             batch.draw(poly,a.x,a.y, floatArrayOf(gd.toFloatBits(),gc.toFloatBits(),gb.toFloatBits(),ga.toFloatBits()))
         }
+    }
+
+    fun line(a: Vector2, b: Vector2, ga:Color, gb: Color) {
+        if (drawing >= 0) {
+            batch.color = white.toFloatBits()
+            val fa = floatArrayOf(0f, 0f, 1f, 0f, 1f, 1f, 0f, 1f)
+            val sa = shortArrayOf(0, 1, 2, 0, 2, 3)
+            val poly = PolygonRegion(TextureRegion(px), fa, sa)
+            val pt0 = a
+            val pt1 = b
+
+            val delta = pt1.cpy().sub(pt0)
+
+            if (Math.abs(delta.x) >= Math.abs(delta.y)) {
+                if (delta.x >= 0) {
+                    poly.vertices[0] = pt0.x
+                    poly.vertices[1] = pt0.y
+                    poly.vertices[2] = pt1.x + 1
+                    poly.vertices[3] = pt1.y
+                    poly.vertices[4] = pt1.x + 1
+                    poly.vertices[5] = pt1.y + 1
+                    poly.vertices[6] = pt0.x
+                    poly.vertices[7] = pt0.y + 1
+                } else {
+                    poly.vertices[0] = pt0.x + 1
+                    poly.vertices[1] = pt0.y
+                    poly.vertices[2] = pt1.x
+                    poly.vertices[3] = pt1.y
+                    poly.vertices[4] = pt1.x
+                    poly.vertices[5] = pt1.y + 1
+                    poly.vertices[6] = pt0.x + 1
+                    poly.vertices[7] = pt0.y + 1
+                }
+            } else {
+                if (delta.y >= 0) {
+                    poly.vertices[0] = pt0.x + 1
+                    poly.vertices[1] = pt0.y
+                    poly.vertices[2] = pt1.x + 1
+                    poly.vertices[3] = pt1.y + 1
+                    poly.vertices[4] = pt1.x
+                    poly.vertices[5] = pt1.y + 1
+                    poly.vertices[6] = pt0.x
+                    poly.vertices[7] = pt0.y
+                } else {
+                    poly.vertices[0] = pt0.x + 1
+                    poly.vertices[1] = pt0.y + 1
+                    poly.vertices[2] = pt1.x + 1
+                    poly.vertices[3] = pt1.y
+                    poly.vertices[4] = pt1.x
+                    poly.vertices[5] = pt1.y
+                    poly.vertices[6] = pt0.x
+                    poly.vertices[7] = pt0.y + 1
+                }
+            }
+            batch.draw(poly, 0f, 0f, floatArrayOf(ga.toFloatBits(), gb.toFloatBits(), gb.toFloatBits(), ga.toFloatBits()))
+        }
+    }
+
+    fun polyLines(a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
+        line(a,b,ga,gb)
+        line(b,c,gb,gc)
+        line(c,d,gc,gd)
+        line(d,a,gd,ga)
     }
 
 }
