@@ -484,7 +484,7 @@ class QuadDraw {
             poly.vertices[3] = spr.regionHeight.toFloat()
             poly.vertices[5] = 0f
             poly.vertices[7] = 0f
-            batch.draw(poly,0f,0f, floatArrayOf(gd.toFloatBits(),gc.toFloatBits(),gb.toFloatBits(),ga.toFloatBits()))
+            batch.draw(poly,a.x,a.y, floatArrayOf(gd.toFloatBits(),gc.toFloatBits(),gb.toFloatBits(),ga.toFloatBits()))
         }
     }
 

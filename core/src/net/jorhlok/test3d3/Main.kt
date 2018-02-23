@@ -13,6 +13,7 @@ class Main {
     //Main is created after GDX is set up so the below can be initialized on construction
     val img = Texture("badlogic.jpg")
     val grass = Texture("ISLAND01.png")
+    val font = DosFont()
     var statetime = 0f
 
     val w = 640//*2
@@ -157,6 +158,9 @@ class Main {
         cube.trnsPrjLightAdd(renderer)
         renderer.render()
 
+        quadDraw.endChecker()
+        font.drawString(quadDraw,"Hello, World!\n\tweh")
+
         quadDraw.end()
         quadDraw.fbflip()
     }
@@ -164,6 +168,7 @@ class Main {
     fun dispose() {
         img.dispose()
         grass.dispose()
+        font.dispose()
         quadDraw.dispose()
     }
 }
