@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.IntIntMap
 class FPControllerCamera(private val camera: Camera) : InputAdapter() {
     //    private val camera: Camera
     private val keys = IntIntMap()
+    private val newkeys = IntIntMap()
     private val STRAFE_LEFT = Input.Keys.A
     private val STRAFE_RIGHT = Input.Keys.D
     private val FORWARD = Input.Keys.W
@@ -42,12 +43,22 @@ class FPControllerCamera(private val camera: Camera) : InputAdapter() {
 
     override fun keyDown(keycode: Int): Boolean {
         keys.put(keycode, keycode)
+        newkeys.put(keycode,keycode)
         return true
     }
 
     override fun keyUp(keycode: Int): Boolean {
         keys.remove(keycode, 0)
+        newkeys.remove(keycode,0)
         return true
+    }
+
+    fun newlyPressed(keycode: Int): Boolean {
+        if (newkeys.containsKey(keycode)) {
+            newkeys.remove(keycode,0)
+            return true
+        }
+        return false
     }
 
     /** Sets the velocity in units per second for moving forward, backward and strafing left/right.

@@ -457,7 +457,7 @@ class QuadDraw {
             poly.vertices[4] = a.x+b.x
             poly.vertices[5] = a.y
             poly.vertices[6] = a.x
-            poly.vertices[7] = a.x
+            poly.vertices[7] = a.y
             batch.draw(poly,0f,0f, floatArrayOf(gd.toFloatBits(),gc.toFloatBits(),gb.toFloatBits(),ga.toFloatBits()))
         }
     }
@@ -475,7 +475,7 @@ class QuadDraw {
             poly.vertices[4] = a.x+b.x
             poly.vertices[5] = a.y+b.y
             poly.vertices[6] = a.x
-            poly.vertices[7] = a.x+b.y
+            poly.vertices[7] = a.y+b.y
             batch.draw(poly,0f,0f, floatArrayOf(ga.toFloatBits(),gb.toFloatBits(),gc.toFloatBits(),gd.toFloatBits()))
         }
     }
