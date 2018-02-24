@@ -36,7 +36,7 @@ class Main {
         cam.near = 1/64f
         cam.far = 128f
         cam.update()
-        renderer.camOverscan = 1.5f //0.125f
+        renderer.camOverscan = 1.5f
 
         mesh.vertex.add(Vector3(-2f,-3f,-2f))
         mesh.vertex.add(Vector3(2f,-1f,-2f))

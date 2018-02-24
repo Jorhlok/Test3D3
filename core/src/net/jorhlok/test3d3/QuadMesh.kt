@@ -113,7 +113,7 @@ class QuadMesh {
                     else quad.color[0] = white.cpy()
                 }
 
-                if (i < lit.size && lit[i] && ( type.size <= i || type[i] <= QuadDraw.Type.DistortedQuad.ordinal) ) {
+                if (i < lit.size && lit[i] && ( type.size <= i || type[i] <= QuadDraw.Type.PolyLines.ordinal) ) {
                         val al = white.cpy()
                         val bl = white.cpy()
                         val cl = white.cpy()
@@ -150,7 +150,7 @@ class QuadMesh {
     fun calcSurfaceNormals() {
         sNormal.clear()
         for (i in 0 until index.size/4) {
-            if (i < type.size && type[i] > QuadDraw.Type.DistortedQuad.ordinal) continue
+            if (i < type.size && type[i] > QuadDraw.Type.PolyLines.ordinal) continue
             val ai = index[i * 4].toInt()
             val bi = index[i * 4 + 1].toInt()
             val ci = index[i * 4 + 2].toInt()
@@ -166,7 +166,7 @@ class QuadMesh {
         for (j in 0 until vertex.size) {
             val n = Vector3()
             for (i in 0 until index.size/4) {
-                if (i < type.size && type[i] > QuadDraw.Type.DistortedQuad.ordinal) continue
+                if (i < type.size && type[i] > QuadDraw.Type.PolyLines.ordinal) continue
                 if (i < sNormal.size) {
                     val ai = index[i * 4].toInt()
                     val bi = index[i * 4 + 1].toInt()

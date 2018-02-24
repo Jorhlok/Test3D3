@@ -18,10 +18,10 @@ class QuadDraw {
     enum class Type {
         DistortedSprite,
         DistortedQuad,
+        PolyLines,
         ScaledSprite,
         ScaledQuad,
         Sprite,
-        PolyLines,
         Line,
         Point
     }
@@ -30,7 +30,7 @@ class QuadDraw {
     var height = 360//*2
     var fbfilter = Texture.TextureFilter.Nearest
     var checkerSize = 1
-    var maxDrawCallsPer = 1024 //prevents sharp angled quads in perspective from causing huge drawing lag spikes
+    var maxDrawCallsPer = 1024 //prevents sharp angled quads in perspective from causing huge drawing lag spikes, hopefully?
     private val white = Color(1f,1f,1f,1f)
     private val rgba = Pixmap.Format.RGBA8888
     private val nearest = Texture.TextureFilter.Nearest
@@ -284,7 +284,7 @@ class QuadDraw {
 
     fun line(a: Vector2, b: Vector2, col:Color = white) { line(a,b,col,col) }
 
-    fun polyLines(a: Vector2, b: Vector2, c: Vector2, d: Vector2, col:Color = white) { polyLines(a,b,c,d,col) }
+    fun polyLines(a: Vector2, b: Vector2, c: Vector2, d: Vector2, col:Color = white) { polyLines(a,b,c,d,col,col,col,col) }
 
     fun point(a: Vector2, col: Color = white) { sprite(TextureRegion(px),a,col) }
 

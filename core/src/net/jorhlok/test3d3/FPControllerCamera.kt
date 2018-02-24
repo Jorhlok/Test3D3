@@ -20,10 +20,10 @@ class FPControllerCamera(private val camera: Camera) : InputAdapter() {
     private val BACKWARD = Input.Keys.S
     private val UP = Input.Keys.Q
     private val DOWN = Input.Keys.E
-    private val NORTH = Input.Keys.UP
-    private val SOUTH = Input.Keys.DOWN
-    private val WEST = Input.Keys.LEFT
-    private val EAST = Input.Keys.RIGHT
+    private val NORTH = Input.Keys.I
+    private val SOUTH = Input.Keys.K
+    private val WEST = Input.Keys.J
+    private val EAST = Input.Keys.L
     private var velocity = 5f
     private var degreesPerPixel = 0.5f
     private val tmp = Vector3()
