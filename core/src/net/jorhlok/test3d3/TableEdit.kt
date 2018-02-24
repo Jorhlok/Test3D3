@@ -16,6 +16,7 @@ class TableEdit {
     val flasherMax = 1f
     val font = DosFont()
     val draw = QuadDraw()
+    val text = Textbox(font,draw)
     val cam = PerspectiveCamera(66.666667f, w.toFloat(), h.toFloat())
     val camController = FPControllerCamera(cam)
     val renderer = Quad3DRender(cam,draw)
@@ -25,7 +26,7 @@ class TableEdit {
     var cellx = 0
     var celly = -1
     var x = 0
-    var string = ""
+    var string = "-1.0"
     var topcell = 0
 
     val bg = Color(0.5f,0.5f,1f,1f)
@@ -213,25 +214,22 @@ class TableEdit {
                 var bottomcell = (h-12)/10+1
                 if (bottomcell > mesh.vertex.size) bottomcell = mesh.vertex.size
                 for (i in topcell until bottomcell) {
-                    val backcol = Color (0.75f,0.75f,0.75f,1f)
-                    if (i == celly) backcol.set(1f,1f,1f,1f)
+                    val backcol = Color(0.75f,0.75f,0.75f,1f)
+                    if (i == celly) backcol.set(Color.WHITE)
+                    val curcol = Color(Color.BLUE)
+                    if (flasher > flasherMax/2) curcol.set(Color.GREEN)
 
-                    var tmp = i.toString()
-                    draw.scaledQuad(Vector2(w-81f*3+1-tmp.length*8-1,12f+10*(i-topcell)),Vector2(8f*tmp.length,9f),backcol)
-                    draw.scaledQuad(Vector2(w-81f*3+1,12f+10*(i-topcell)),Vector2(8*10f,9f),backcol)
-                    draw.scaledQuad(Vector2(w-81f*2+1,12f+10*(i-topcell)),Vector2(8*10f,9f),backcol)
-                    draw.scaledQuad(Vector2(w-81f+1,12f+10*(i-topcell)),Vector2(8*10f,9f),backcol)
-
-                    font.drawString(draw,tmp,Vector2(w-81f*3+2-1-tmp.length*8,13f+10*(i-topcell)),Color.BLACK)
-                    tmp = mesh.vertex[i].x.toString()
-                    if (tmp.length > 10) tmp.substring(0,9)
-                    font.drawString(draw,tmp,Vector2(w-81f*3+2+(10-tmp.length)*8,13f+10*(i-topcell)),Color.BLACK)
-                    tmp = mesh.vertex[i].y.toString()
-                    if (tmp.length > 10) tmp.substring(0,9)
-                    font.drawString(draw,tmp,Vector2(w-81f*2+2+(10-tmp.length)*8,13f+10*(i-topcell)),Color.BLACK)
-                    tmp = mesh.vertex[i].z.toString()
-                    if (tmp.length > 10) tmp.substring(0,9)
-                    font.drawString(draw,tmp,Vector2(w-81f+2+(10-tmp.length)*8,13f+10*(i-topcell)),Color.BLACK)
+                    val tmp = i.toString()
+                    text.laBox(tmp,w-81f*3+1-tmp.length*8-1,12f+10*(i-topcell),tmp.length,backcol,Color.BLACK)
+                    if (i == celly && cellx == 0) {
+                        text.raCursorBox(string,w-81f*3+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK,x,curcol)
+                    } else text.raBox(mesh.vertex[i].x.toString(),w-81f*3+1,12f+10*(i-topcell),10,backcol,Color.BLACK)
+                    if (i == celly && cellx == 1) {
+                        text.raCursorBox(string,w-81f*2+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK,x,curcol)
+                    } else text.raBox(mesh.vertex[i].y.toString(),w-81f*2+1,12f+10*(i-topcell),10,backcol,Color.BLACK)
+                    if (i == celly && cellx == 2) {
+                        text.raCursorBox(string,w-81f+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK,x,curcol)
+                    } else text.raBox(mesh.vertex[i].z.toString(),w-81f+1,12f+10*(i-topcell),10,backcol,Color.BLACK)
                 }
             }
             2 -> {
