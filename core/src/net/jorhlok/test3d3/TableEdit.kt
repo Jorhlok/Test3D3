@@ -153,151 +153,116 @@ class TableEdit {
             if (tab < 0) tab = 0
             if (tab > 7) tab = 7
         } else {
-            when (tab) {
-                0 -> {
-
+            val bottomcell = (h-12)/10+topcell
+            if (up) {
+                --celly
+                editing = false
+            }
+            else if (dn) {
+                ++celly
+                editing = false
+            }
+            if  (celly >= 0) {
+                if (celly < topcell) topcell = celly
+                if (celly > tabMaxY(tab)) {
+                    if (tabCanAddRow(tab)) tabAddRow(tab)
+                    else --celly
                 }
-                1 -> {
-                    val bottomcell = (h-12)/10+1+topcell
-                    if (up) {
-                        --celly
-                        editing = false
-                    }
-                    else if (dn) {
-                        ++celly
-                        editing = false
-                    }
-                    if  (celly >= 0) {
-                        if (celly < topcell) topcell = celly
-                        if (celly >= mesh.vertex.size) mesh.vertex.add(Vector3())
-                        if (celly >= bottomcell) ++topcell
-                    }
-                    if (editing) {
-                        if (lf) --x
-                        else if (rt) ++x
-                        if (x < 0) x = 0
-                        else if (x > string.length) x = string.length
-                        if (keytab) {
-                            x = 0
-                            ++cellx
-                            editing = false
-                        }
-                        if (keyenter) {
-                            editing = false
-                        }
-                        cellx %= 3
-                        if (cellx < 0) cellx = 2
+                if (celly >= bottomcell) ++topcell
+            }
+            if (editing) {
+                if (lf) --x
+                else if (rt) ++x
+                if (x < 0) x = 0
+                else if (x > string.length) x = string.length
+                if (keytab) {
+                    x = 0
+                    ++cellx
+                    editing = false
+                }
+                if (keyenter) {
+                    editing = false
+                }
+                cellx %= 3
+                if (cellx < 0) cellx = 2
 
-                        if (editing) {
-                            var key = ""
-                            if (key0) key += "0"
-                            if (key1) key += "1"
-                            if (key2) key += "2"
-                            if (key3) key += "3"
-                            if (key4) key += "4"
-                            if (key5) key += "5"
-                            if (key6) key += "6"
-                            if (key7) key += "7"
-                            if (key8) key += "8"
-                            if (key9) key += "9"
-                            if (keydot && '.' !in string.toCharArray()) key += "."
-                            if (keyminus && '-' !in string.toCharArray()) key += "-"
-                            if (x == 0) string = key + string
-                            else if (x == string.length) string += key
-                            else string = string.substring(0,x) + key + string.substring(x,string.length)
-                            x += key.length
+                if (editing) {
+                    var key = ""
+                    if (key0) key += "0"
+                    if (key1) key += "1"
+                    if (key2) key += "2"
+                    if (key3) key += "3"
+                    if (key4) key += "4"
+                    if (key5) key += "5"
+                    if (key6) key += "6"
+                    if (key7) key += "7"
+                    if (key8) key += "8"
+                    if (key9) key += "9"
+                    if (keydot && '.' !in string.toCharArray()) key += "."
+                    if (keyminus && '-' !in string.toCharArray()) key += "-"
+                    if (x == 0) string = key + string
+                    else if (x == string.length) string += key
+                    else string = string.substring(0,x) + key + string.substring(x,string.length)
+                    x += key.length
 
-                            if (keybksp && x > 0) {
-                                if (x == 1) string = string.substring(1,string.length)
-                                else if (x == string.length) string = string.substring(0,x-1)
-                                else string = string.substring(0,x-1) + string.substring(x,string.length)
-                                --x
-                            }
-                            if (keydel && x < string.length) {
-                                if (x == 0) string = string.substring(1,string.length)
-                                else if (x == string.length-1) string = string.substring(0,x)
-                                else string = string.substring(0,x) + string.substring(x+1,string.length)
-                            }
+                    if (keybksp && x > 0) {
+                        if (x == 1) string = string.substring(1,string.length)
+                        else if (x == string.length) string = string.substring(0,x-1)
+                        else string = string.substring(0,x-1) + string.substring(x,string.length)
+                        --x
+                    }
+                    if (keydel && x < string.length) {
+                        if (x == 0) string = string.substring(1,string.length)
+                        else if (x == string.length-1) string = string.substring(0,x)
+                        else string = string.substring(0,x) + string.substring(x+1,string.length)
+                    }
 
-                            if (string.length > 10) string = string.substring(0,10)
-                            val num = string.toFloatOrNull()
-                            if (num != null) {
-                                when (cellx) {
-                                    0 -> mesh.vertex[celly].x = num
-                                    1 -> mesh.vertex[celly].y = num
-                                    2 -> mesh.vertex[celly].z = num
-                                }
-                            }
-                        }
-                    } else {
-                        if (lf) --cellx
-                        else if (rt) ++cellx
-                        if (keytab) ++cellx
-                        cellx %= 3
-                        if (cellx < 0) cellx = 2
-                        if (keyenter) {
-                            editing = true
-                            when (cellx) {
-                                0 -> string = mesh.vertex[celly].x.toString()
-                                1 -> string = mesh.vertex[celly].y.toString()
-                                2 -> string = mesh.vertex[celly].z.toString()
-                            }
-                            x = string.length
-                        }
-                        if (keybksp) {
-                            editing = true
-                            string = ""
-                        }
-                        if (!editing) {
-                            if (keyplus) {
-                                when (cellx) {
-                                    0 -> mesh.vertex[celly].x += smallValue
-                                    1 -> mesh.vertex[celly].y += smallValue
-                                    2 -> mesh.vertex[celly].z += smallValue
-                                }
-                            }
-                            if (keyminus) {
-                                when (cellx) {
-                                    0 -> mesh.vertex[celly].x -= smallValue
-                                    1 -> mesh.vertex[celly].y -= smallValue
-                                    2 -> mesh.vertex[celly].z -= smallValue
-                                }
-                            }
-                            if (keydel) {
-                                mesh.vertex.removeRange(celly,celly)
-                                if (celly >= mesh.vertex.size) {
-                                    celly = mesh.vertex.size-1
-                                }
-                                if (topcell > 0 && bottomcell > mesh.vertex.size) --topcell
-                            }
+                    if (string.length > 10) string = string.substring(0,10)
+                    val num = string.toFloatOrNull()
+                    if (num != null) {
+                        when (cellx) {
+                            0 -> mesh.vertex[celly].x = num
+                            1 -> mesh.vertex[celly].y = num
+                            2 -> mesh.vertex[celly].z = num
                         }
                     }
                 }
-                2 -> {
-
+            } else {
+                if (lf) --cellx
+                else if (rt) ++cellx
+                if (keytab) ++cellx
+                cellx %= tabCellsInRow(tab,celly)
+                if (cellx < 0) cellx = tabCellsInRow(tab,celly)-1
+                if (keyenter) {
+                    if (tabEditable(tab,cellx,celly)) {
+                        editing = true
+                        string = tabCellString(tab,cellx,celly)
+                        val width = tabCellWidth(tab,cellx,celly)
+                        if (string.length > width) string = string.substring(0,width)
+                        x = string.length
+                    } else tabEnter(tab,cellx,celly)
                 }
-                3 -> {
-
+                if (keybksp && tabEditable(tab,cellx,celly)) {
+                    editing = true
+                    string = ""
+                    x = 0
                 }
-                4 -> {
-
-                }
-                5 -> {
-
-                }
-                6 -> {
-
-                }
-                7 -> {
-
-                }
-                else -> {
-                    if (tab < 0) tab = 0
-                    if (tab > 7) tab = 7
+                if (!editing) {
+                    if (keyplus) tabCellPlus(tab,cellx,celly)
+                    if (keyminus) tabCellMinus(tab,cellx,celly)
+                    if (keydel) {
+                        tabDelRow(tab,celly)
+                        val size = tabMaxY(tab)
+                        if (celly > size) {
+                            celly = size
+                        }
+                        if (topcell > 0 && bottomcell > size) --topcell
+                    }
                 }
             }
         }
     }
+
 
     fun tableDraw() {
         val tabNames = arrayOf("Opt","Vtx","Idx","Spr","Col","Chk","Typ","Lit")
@@ -553,6 +518,35 @@ class TableEdit {
             7 -> {
             }
         }
+    }
+
+    fun tabCanAddRow(tab: Int): Boolean {
+//        if (tab == 1 || tab == 2) return true
+        return false
+    }
+
+    fun tabAddRow(tab: Int) {
+
+    }
+
+    fun tabDelRow(tab: Int, y: Int) {
+
+    }
+
+    fun tabEditable(tab: Int, x: Int, y: Int): Boolean {
+        return false
+    }
+
+    fun tabEnter(tab: Int, x: Int, y: Int) {
+
+    }
+
+    fun tabCellPlus(tab: Int, x: Int, y: Int) {
+
+    }
+
+    fun tabCellMinus(tab: Int, x: Int, y: Int) {
+
     }
 
 
