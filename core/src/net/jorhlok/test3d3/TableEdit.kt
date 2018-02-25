@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 
@@ -198,8 +199,8 @@ class TableEdit {
                     if (key7) key += "7"
                     if (key8) key += "8"
                     if (key9) key += "9"
-                    if (keydot && '.' !in string.toCharArray()) key += "."
-                    if (keyminus && '-' !in string.toCharArray()) key += "-"
+                    if (keydot && tabCanDot(tab,cellx,celly) && '.' !in string.toCharArray()) key += "."
+                    if (keyminus && tabCanMinus(tab,cellx,celly) && '-' !in string.toCharArray()) key += "-"
                     if (x == 0) string = key + string
                     else if (x == string.length) string += key
                     else string = string.substring(0,x) + key + string.substring(x,string.length)
@@ -217,15 +218,7 @@ class TableEdit {
                         else string = string.substring(0,x) + string.substring(x+1,string.length)
                     }
 
-                    if (string.length > 10) string = string.substring(0,10)
-                    val num = string.toFloatOrNull()
-                    if (num != null) {
-                        when (cellx) {
-                            0 -> mesh.vertex[celly].x = num
-                            1 -> mesh.vertex[celly].y = num
-                            2 -> mesh.vertex[celly].z = num
-                        }
-                    }
+                    tabWriteString(tab,cellx,celly,string)
                 }
             } else {
                 if (lf) --cellx
@@ -262,7 +255,6 @@ class TableEdit {
             }
         }
     }
-
 
     fun tableDraw() {
         val tabNames = arrayOf("Opt","Vtx","Idx","Spr","Col","Chk","Typ","Lit")
@@ -321,22 +313,24 @@ class TableEdit {
                 return mesh.vertex.size-1
             }
             2 -> {
+                if (mesh.index.size == 0) return -1
                 return (mesh.index.size-1)/4
             }
             3 -> {
-                return (mesh.index.size-1)/4
+                return (mesh.sprite.size-1)
             }
             4 -> {
-                return (mesh.index.size-1)/4
+                if (mesh.color.size == 0) return -1
+                return (mesh.color.size-1)/4
             }
             5 -> {
-                return (mesh.index.size-1)/4
+                return (mesh.checker.size-1)
             }
             6 -> {
-                return (mesh.index.size-1)/4
+                return (mesh.type.size-1)
             }
             7 -> {
-                return (mesh.index.size-1)/4
+                return (mesh.lit.size-1)
             }
         }
         return -1
@@ -484,13 +478,18 @@ class TableEdit {
 //                return ""
             }
             4 -> {
-//                return ""
+                if (y*4+x%4 < mesh.color.size)
+                when (x%3) {
+                    0 -> return (mesh.color[y*4+x%4].r*255).toInt().toString()
+                    1 -> return (mesh.color[y*4+x%4].g*255).toInt().toString()
+                    2 -> return (mesh.color[y*4+x%4].b*255).toInt().toString()
+                }
             }
             5 -> {
-//                return mesh.checker[y].toString()
+                return mesh.checker[y].toString()
             }
             6 -> {
-//                return mesh.type[y].toString()
+                return mesh.type[y].toString()
             }
             7 -> {
                 return mesh.lit[y].toString()
@@ -504,6 +503,7 @@ class TableEdit {
             0 -> {
             }
             1 -> {
+
             }
             2 -> {
             }
@@ -521,32 +521,198 @@ class TableEdit {
     }
 
     fun tabCanAddRow(tab: Int): Boolean {
-//        if (tab == 1 || tab == 2) return true
+        if (tab > 0) return true
         return false
     }
 
     fun tabAddRow(tab: Int) {
-
+        when (tab) {
+            0 -> {
+            }
+            1 -> {
+                mesh.vertex.add(Vector3())
+            }
+            2 -> {
+                mesh.index.add(0,0,0,0)
+            }
+            3 -> {
+                mesh.sprite.add(TextureRegion())
+            }
+            4 -> {
+                mesh.color.add(Color.WHITE.cpy(),Color.WHITE.cpy(),Color.WHITE.cpy(),Color.WHITE.cpy())
+            }
+            5 -> {
+                mesh.checker.add(0)
+            }
+            6 -> {
+                mesh.type.add(1)
+            }
+            7 -> {
+                mesh.lit.add(true)
+            }
+        }
     }
 
     fun tabDelRow(tab: Int, y: Int) {
-
+        when (tab) {
+            0 -> {
+            }
+            1 -> {
+                mesh.vertex.removeIndex(y)
+            }
+            2 -> {
+                mesh.index.removeRange(y*4,y*4+3)
+            }
+            3 -> {
+                mesh.sprite.removeIndex(y)
+            }
+            4 -> {
+                mesh.color.removeRange(y*4,y*4+3)
+            }
+            5 -> {
+                mesh.checker.removeIndex(y)
+            }
+            6 -> {
+                mesh.type.removeIndex(y)
+            }
+            7 -> {
+                mesh.lit.removeIndex(y)
+            }
+        }
     }
 
     fun tabEditable(tab: Int, x: Int, y: Int): Boolean {
+        if (tab in 1..6) return true
         return false
     }
 
     fun tabEnter(tab: Int, x: Int, y: Int) {
+        when (tab) {
+            0 -> {
 
+            }
+            1 -> {
+
+            }
+            2 -> {
+
+            }
+            3 -> {
+
+            }
+            4 -> {
+
+            }
+            5 -> {
+
+            }
+            6 -> {
+
+            }
+            7 -> {
+
+            }
+        }
     }
 
     fun tabCellPlus(tab: Int, x: Int, y: Int) {
+        when (tab) {
+            0 -> {
 
+            }
+            1 -> {
+                when (x) {
+                    0 -> mesh.vertex[y].x += smallValue
+                    1 -> mesh.vertex[y].y += smallValue
+                    2 -> mesh.vertex[y].z += smallValue
+                }
+            }
+            2 -> {
+                ++mesh.index[y*4+x]
+            }
+            3 -> {
+
+            }
+            4 -> {
+                when (x%3) {
+                    0 -> mesh.color[y*4+x%4].r += 1f/255
+                    1 -> mesh.color[y*4+x%4].g += 1f/255
+                    2 -> mesh.color[y*4+x%4].b += 1f/255
+                }
+                mesh.color[y*4+x%4].set(mesh.color[y*4+x%4].r,mesh.color[y*4+x%4].g,mesh.color[y*4+x%4].b,mesh.color[y*4+x%4].a)
+            }
+            5 -> {
+                ++mesh.checker[y]
+                if (mesh.checker[y] > 2) mesh.checker[y] = 2
+            }
+            6 -> {
+                ++mesh.type[y]
+                if (mesh.type[y] > QuadDraw.Type.Point.ordinal) mesh.type[y] = QuadDraw.Type.Point.ordinal.toByte()
+            }
+            7 -> {
+                if (!mesh.lit[y]) mesh.lit[y] = true
+            }
+        }
     }
 
     fun tabCellMinus(tab: Int, x: Int, y: Int) {
+        when (tab) {
+            0 -> {
 
+            }
+            1 -> {
+                when (x) {
+                    0 -> mesh.vertex[y].x -= smallValue
+                    1 -> mesh.vertex[y].y -= smallValue
+                    2 -> mesh.vertex[y].z -= smallValue
+                }
+            }
+            2 -> {
+                --mesh.index[y*4+x]
+            }
+            3 -> {
+
+            }
+            4 -> {
+                when (x%3) {
+                    0 -> mesh.color[y*4+x%4].r -= 1f/255
+                    1 -> mesh.color[y*4+x%4].g -= 1f/255
+                    2 -> mesh.color[y*4+x%4].b -= 1f/255
+                }
+                mesh.color[y*4+x%4].set(mesh.color[y*4+x%4].r,mesh.color[y*4+x%4].g,mesh.color[y*4+x%4].b,mesh.color[y*4+x%4].a)
+            }
+            5 -> {
+                --mesh.checker[y]
+                if (mesh.checker[y] < 0) mesh.checker[y] = 0
+            }
+            6 -> {
+                --mesh.type[y]
+                if (mesh.type[y] < 0) mesh.type[y] = 0
+            }
+            7 -> {
+                if (mesh.lit[y]) mesh.lit[y] = false
+            }
+        }
+    }
+
+    fun tabCanDot(tab: Int, x: Int, y: Int): Boolean {
+        when (tab) {
+            0 -> {
+
+            }
+            1 -> return true
+        }
+        return false
+    }
+
+    fun tabCanMinus(tab: Int, x: Int, y: Int): Boolean {
+        when (tab) {
+            0 -> {
+
+            }
+            1 -> return true
+        }
+        return false
     }
 
 
