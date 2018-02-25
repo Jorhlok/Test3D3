@@ -16,7 +16,6 @@ class TableEdit {
     val flasherMax = 1f
     val font = DosFont()
     val draw = QuadDraw()
-    val text = Textbox(font,draw)
     val cam = PerspectiveCamera(66.666667f, w.toFloat(), h.toFloat())
     val camController = FPControllerCamera(cam)
     val renderer = Quad3DRender(cam,draw)
@@ -26,11 +25,11 @@ class TableEdit {
     var cellx = 0
     var celly = -1
     var x = 0
-    var string = "-1.0"
+    var string = ""
     var topcell = 0
     var editing = false
-    var smallValue = 0.0625f
 
+    var smallValue = 0.0625f
     val bg = Color(0.5f,0.5f,1f,1f)
     val ambient = Color(0.2f,0.2f,0.2f,1f)
     val light = Color(1f,1f,1f,1f)
@@ -87,7 +86,7 @@ class TableEdit {
         mesh.calcNormals()
         mesh.unlight()
         mesh.lightAmbient(ambient)
-        mesh.lightDir(light, lightDir.nor())
+        mesh.lightDir(light, lightDir.cpy().nor())
 
         Gdx.gl.glClearColor(bg.r,bg.g,bg.b,bg.a)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -109,6 +108,16 @@ class TableEdit {
         draw.dispose()
     }
 
+    /* tabs
+     *  0   Editor Options
+     *  1   Vertecies
+     *  2   Indecies
+     *  3   Sprites
+     *  4   Colors
+     *  5   Checker
+     *  6   Type
+     *  7   Lit
+     */
     fun tableUpdate() {
         val keyup = camController.newlyPressed(Input.Keys.UP)
         val keydn = camController.newlyPressed(Input.Keys.DOWN)
@@ -291,16 +300,6 @@ class TableEdit {
     }
 
     fun tableDraw() {
-        /* tabs
-         *  0   Editor Options
-         *  1   Vertecies
-         *  2   Indecies
-         *  3   Sprites
-         *  4   Colors
-         *  5   Checker
-         *  6   Type
-         *  7   Lit
-         */
         val tabNames = arrayOf("Opt","Vtx","Idx","Spr","Col","Chk","Typ","Lit")
 
         //tabs
@@ -321,54 +320,270 @@ class TableEdit {
         }
         draw.line(Vector2(w-26*8f,11f),Vector2(w.toFloat(),11f),Color(0.25f,0.25f,0.25f,1f))
 
+        var bottomCell = (h-12)/10+topcell
+        val maxy = tabMaxY(tab)
+        if (bottomCell > maxy) bottomCell = maxy
+        for (i in 0..bottomCell) {
+            val backcol = Color(0.75f,0.75f,0.75f,1f)
+            if (i == celly) backcol.set(Color.WHITE)
+            val curcol = Color(Color.BLUE)
+            if (flasher > flasherMax/2) curcol.set(Color.GREEN)
+            val columns = tabCellsInRow(tab,i)
+            var totalw = 0
+            var padding = 0
+            for (j in 0 until columns) {
+                val k = columns-j-1
+                val cellw = tabCellWidth(tab,k,i)
+                totalw += cellw
+                ++padding
+                val str = tabCellString(tab,k,i)
+                if (i == celly && k == cellx) {
+                    if (editing) raCursorBox(string,w-8f*totalw-padding,12f+10*(i-topcell),cellw,Color.YELLOW,Color.BLACK,x,curcol)
+                    else raBox(str,w-8f*totalw-padding,12f+10*(i-topcell),cellw,Color.YELLOW,Color.BLACK)
+                } else raBox(str,w-8f*totalw-padding,12f+10*(i-topcell),cellw,backcol,Color.BLACK)
+            }
+            val str = tabRowLabel(tab,i)
+            laBox(str,w-8f*(totalw+str.length)-padding-1,12f+10*(i-topcell),str.length,backcol,Color.BLACK)
+        }
+    }
+
+    fun tabMaxY(tab: Int): Int {
         when (tab) {
             0 -> {
-
+                return 6
             }
             1 -> {
-                var bottomcell = (h-12)/10+1+topcell
-                if (bottomcell > mesh.vertex.size) bottomcell = mesh.vertex.size
-                for (i in topcell until bottomcell) {
-                    val backcol = Color(0.75f,0.75f,0.75f,1f)
-                    if (i == celly) backcol.set(Color.WHITE)
-                    val curcol = Color(Color.BLUE)
-                    if (flasher > flasherMax/2) curcol.set(Color.GREEN)
+                return mesh.vertex.size-1
+            }
+            2 -> {
+                return (mesh.index.size-1)/4
+            }
+            3 -> {
+                return (mesh.index.size-1)/4
+            }
+            4 -> {
+                return (mesh.index.size-1)/4
+            }
+            5 -> {
+                return (mesh.index.size-1)/4
+            }
+            6 -> {
+                return (mesh.index.size-1)/4
+            }
+            7 -> {
+                return (mesh.index.size-1)/4
+            }
+        }
+        return -1
+    }
 
-                    val tmp = i.toString()
-                    text.laBox(tmp,w-81f*3+1-tmp.length*8-1,12f+10*(i-topcell),tmp.length,backcol,Color.BLACK)
-                    if (i == celly && cellx == 0) {
-                        if (editing) text.raCursorBox(string,w-81f*3+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK,x,curcol)
-                        else text.raBox(mesh.vertex[i].x.toString(),w-81f*3+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK)
-                    } else text.raBox(mesh.vertex[i].x.toString(),w-81f*3+1,12f+10*(i-topcell),10,backcol,Color.BLACK)
-                    if (i == celly && cellx == 1) {
-                        if (editing) text.raCursorBox(string,w-81f*2+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK,x,curcol)
-                        else text.raBox(mesh.vertex[i].y.toString(),w-81f*2+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK)
-                    } else text.raBox(mesh.vertex[i].y.toString(),w-81f*2+1,12f+10*(i-topcell),10,backcol,Color.BLACK)
-                    if (i == celly && cellx == 2) {
-                        if (editing) text.raCursorBox(string,w-81f+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK,x,curcol)
-                        else text.raBox(mesh.vertex[i].z.toString(),w-81f+1,12f+10*(i-topcell),10,Color.YELLOW,Color.BLACK)
-                    } else text.raBox(mesh.vertex[i].z.toString(),w-81f+1,12f+10*(i-topcell),10,backcol,Color.BLACK)
+    fun tabCellsInRow(tab: Int, y: Int): Int {
+        when (tab) {
+            0 -> {
+                if (y == 0 || y > 4) return 1
+                else return 3
+            }
+            1 -> {
+                return 3
+            }
+            2 -> {
+                return 4
+            }
+            3 -> {
+                return 1
+            }
+            4 -> {
+                return 3*4
+            }
+            5 -> {
+                return 1
+            }
+            6 -> {
+                return 1
+            }
+            7 -> {
+                return 1
+            }
+        }
+        return -1
+    }
+
+    fun tabCellWidth(tab: Int, x: Int, y: Int): Int {
+        when (tab) {
+            0 -> {
+                if (y == 0 || y > 4) return 15
+                else if (y >= 0 && y <= 3) return 3
+                else return 5
+            }
+            1 -> {
+                return 10
+            }
+            2 -> {
+                return 3
+            }
+            3 -> {
+                return 2
+            }
+            4 -> {
+                return 3
+            }
+            5 -> {
+                return 1
+            }
+            6 -> {
+                return 1
+            }
+            7 -> {
+                return 1
+            }
+        }
+        return -1
+    }
+
+    fun tabRowLabel(tab: Int, y: Int): String {
+        when (tab) {
+            0 -> {
+                when (y) {
+                    0 -> return "Small Value"
+                    1 -> return "BG Color       "
+                    2 -> return "Ambient Light  "
+                    3 -> return "Directional Light"
+                    4 -> return "Light Dir"
+                    5 -> return "Load File"
+                    6 -> return "Save File"
+                }
+            }
+            1 -> {
+                return y.toString()
+            }
+            2 -> {
+                return y.toString()
+            }
+            3 -> {
+                return y.toString()
+            }
+            4 -> {
+                return y.toString()
+            }
+            5 -> {
+                return y.toString()
+            }
+            6 -> {
+                return y.toString()
+            }
+            7 -> {
+                return y.toString()
+            }
+        }
+        return ""
+    }
+
+    fun tabCellString(tab: Int, x: Int, y: Int): String {
+        when (tab) {
+            0 -> {
+                when (y) {
+                    0 -> return smallValue.toString()
+                    1 -> when (x) {
+                        0 -> return (bg.r*255).toInt().toString()
+                        1 -> return (bg.g*255).toInt().toString()
+                        2 -> return (bg.b*255).toInt().toString()
+                    }
+                    2 -> when (x) {
+                        0 -> return (ambient.r*255).toInt().toString()
+                        1 -> return (ambient.g*255).toInt().toString()
+                        2 -> return (ambient.b*255).toInt().toString()
+                    }
+                    3 -> when (x) {
+                        0 -> return (light.r*255).toInt().toString()
+                        1 -> return (light.g*255).toInt().toString()
+                        2 -> return (light.b*255).toInt().toString()
+                    }
+                    4 -> when (x) {
+                        0 -> return lightDir.x.toString()
+                        1 -> return lightDir.y.toString()
+                        2 -> return lightDir.z.toString()
+                    }
+                }
+            }
+            1 -> {
+                when (x) {
+                    0 -> return mesh.vertex[y].x.toString()
+                    1 -> return mesh.vertex[y].y.toString()
+                    2 -> return mesh.vertex[y].z.toString()
                 }
             }
             2 -> {
-
+                return mesh.index[y*4+x].toString()
             }
             3 -> {
-
+//                return ""
             }
             4 -> {
-
+//                return ""
             }
             5 -> {
-
+//                return mesh.checker[y].toString()
             }
             6 -> {
-
+//                return mesh.type[y].toString()
             }
             7 -> {
-
+                return mesh.lit[y].toString()
             }
-            else -> { /*nothin*/ }
+        }
+        return ""
+    }
+
+    fun tabWriteString(tab: Int, x: Int, y: Int, str: String) {
+        when (tab) {
+            0 -> {
+            }
+            1 -> {
+            }
+            2 -> {
+            }
+            3 -> {
+            }
+            4 -> {
+            }
+            5 -> {
+            }
+            6 -> {
+            }
+            7 -> {
+            }
         }
     }
+
+
+    fun laBox(str: String, x: Float, y: Float, w: Int, bgcol: Color, txcol: Color) {
+        draw.scaledQuad(Vector2(x,y), Vector2(8f*w,9f),bgcol)
+        var tmp = str
+        if (tmp.length > w) tmp = str.substring(0,w)
+        font.drawString(draw,tmp, Vector2(x+1,y+1),txcol)
+    }
+
+    fun raBox(str: String, x: Float, y: Float, w: Int, bgcol: Color, txcol: Color) {
+        draw.scaledQuad(Vector2(x,y), Vector2(8f*w,9f),bgcol)
+        var tmp = str
+        if (tmp.length > w) tmp = str.substring(0,w)
+        font.drawString(draw,str,Vector2(x+1+8*(w-tmp.length),y+1),txcol)
+    }
+
+    fun laCursorBox(str: String, x: Float, y: Float, w: Int, bgcol: Color, txcol: Color, cur: Int, curCol: Color) {
+        draw.scaledQuad(Vector2(x,y), Vector2(8f*w,9f),bgcol)
+        var tmp = str
+        if (tmp.length > w) tmp = str.substring(0,w)
+        draw.line(Vector2(cur*8+x,y),Vector2(cur*8+x,y+8),curCol)
+        font.drawString(draw,tmp, Vector2(x+1,y+1),txcol)
+    }
+
+    fun raCursorBox(str: String, x: Float, y: Float, w: Int, bgcol: Color, txcol: Color, cur: Int, curCol: Color) {
+        draw.scaledQuad(Vector2(x,y), Vector2(8f*w,9f),bgcol)
+        var tmp = str
+        if (tmp.length > w) tmp = str.substring(0,w)
+        draw.line(Vector2(cur*8+x+8*(w-tmp.length)-1,y),Vector2(cur*8+x+8*(w-tmp.length)-1,y+8),curCol)
+        font.drawString(draw,str,Vector2(x+8*(w-tmp.length)+1,y+1),txcol)
+    }
+
 }
