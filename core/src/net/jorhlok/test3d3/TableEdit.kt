@@ -184,8 +184,8 @@ class TableEdit {
                 if (keyenter) {
                     editing = false
                 }
-                cellx %= 3
-                if (cellx < 0) cellx = 2
+                cellx %= tabCellsInRow(tab,celly)
+                if (cellx < 0) cellx = tabCellsInRow(tab,celly)-1
 
                 if (editing) {
                     var key = ""
@@ -216,6 +216,12 @@ class TableEdit {
                         if (x == 0) string = string.substring(1,string.length)
                         else if (x == string.length-1) string = string.substring(0,x)
                         else string = string.substring(0,x) + string.substring(x+1,string.length)
+                    }
+
+                    val maxw = tabCellWidth(tab,cellx,celly)
+                    if (string.length > maxw) {
+                        string = string.substring(0,maxw)
+                        if (x > maxw) x = maxw
                     }
 
                     tabWriteString(tab,cellx,celly,string)
@@ -492,7 +498,8 @@ class TableEdit {
                 return mesh.type[y].toString()
             }
             7 -> {
-                return mesh.lit[y].toString()
+                if (mesh.lit[y]) return "1"
+                else return "0"
             }
         }
         return ""
@@ -501,21 +508,97 @@ class TableEdit {
     fun tabWriteString(tab: Int, x: Int, y: Int, str: String) {
         when (tab) {
             0 -> {
+                when (y) {
+                    0 -> {
+                        val f = str.toFloatOrNull()
+                        if (f != null) smallValue = f
+                    }
+                    1 -> {
+                        val s = str.toShortOrNull()
+                        if (s != null) {
+                            when (x) {
+                                0 -> bg.r = s/255f
+                                1 -> bg.g = s/255f
+                                2 -> bg.b = s/255f
+                            }
+                            bg.set(bg.r,bg.g,bg.b,bg.a)
+                        }
+                    }
+                    2 -> {
+                        val s = str.toShortOrNull()
+                        if (s != null) {
+                            when (x) {
+                                0 -> ambient.r = s/255f
+                                1 -> ambient.g = s/255f
+                                2 -> ambient.b = s/255f
+                            }
+                            ambient.set(ambient.r,ambient.g,ambient.b,ambient.a)
+                        }
+                    }
+                    3 -> {
+                        val s = str.toShortOrNull()
+                        if (s != null) {
+                            when (x) {
+                                0 -> light.r = s/255f
+                                1 -> light.g = s/255f
+                                2 -> light.b = s/255f
+                            }
+                            light.set(light.r,light.g,light.b,light.a)
+                        }
+                    }
+                    4 -> {
+                        val f = str.toFloatOrNull()
+                        if (f != null) when (x) {
+                            0 -> lightDir.x = f
+                            1 -> lightDir.y = f
+                            2 -> lightDir.z = f
+                        }
+                    }
+                }
             }
             1 -> {
-
+                val f = str.toFloatOrNull()
+                if (f != null) when (x) {
+                    0 -> mesh.vertex[y].x = f
+                    1 -> mesh.vertex[y].y = f
+                    2 -> mesh.vertex[y].z = f
+                }
             }
             2 -> {
+                val s = str.toShortOrNull()
+                if (s != null) mesh.index[y*4+x] = s
             }
             3 -> {
             }
             4 -> {
+                val i = str.toIntOrNull()
+                if (i != null) {
+                    when (x % 3) {
+                        0 -> mesh.color[y * 4 + x % 4].r = i / 255f
+                        1 -> mesh.color[y * 4 + x % 4].g = i / 255f
+                        2 -> mesh.color[y * 4 + x % 4].b = i / 255f
+                    }
+                    mesh.color[y * 4 + x % 4].set(mesh.color[y * 4 + x % 4].r, mesh.color[y * 4 + x % 4].g, mesh.color[y * 4 + x % 4].b, mesh.color[y * 4 + x % 4].a)
+                }
             }
             5 -> {
+                var b = str.toByteOrNull()
+                if (b != null) {
+                    if (b > 2) b = 2
+                    else if (b < 0) b = 0
+                    mesh.checker[y] = b
+                }
             }
             6 -> {
+                var b = str.toByteOrNull()
+                if (b != null) {
+                    if (b > QuadDraw.Type.Point.ordinal) b = QuadDraw.Type.Point.ordinal.toByte()
+                    else if (b < 0) b = 0
+                    mesh.type[y] = b
+                }
             }
             7 -> {
+                mesh.lit[y] = !str.equals("0")
             }
         }
     }
@@ -582,7 +665,8 @@ class TableEdit {
     }
 
     fun tabEditable(tab: Int, x: Int, y: Int): Boolean {
-        if (tab in 1..6) return true
+        if (tab in 1..7) return true
+        else if (tab == 0 && y <= 4) return true
         return false
     }
 
@@ -617,8 +701,37 @@ class TableEdit {
 
     fun tabCellPlus(tab: Int, x: Int, y: Int) {
         when (tab) {
-            0 -> {
-
+            0 -> when (y) {
+                0 -> smallValue *= 2
+                1 -> {
+                    when (x) {
+                        0 -> bg.r += 1/255f
+                        1 -> bg.g += 1/255f
+                        2 -> bg.b += 1/255f
+                    }
+                    bg.set(bg.r,bg.g,bg.b,bg.a)
+                }
+                2 -> {
+                    when (x) {
+                        0 -> ambient.r += 1/255f
+                        1 -> ambient.g += 1/255f
+                        2 -> ambient.b += 1/255f
+                    }
+                    ambient.set(ambient.r,ambient.g,ambient.b,ambient.a)
+                }
+                3 -> {
+                    when (x) {
+                        0 -> light.r += 1/255f
+                        1 -> light.g += 1/255f
+                        2 -> light.b += 1/255f
+                    }
+                    light.set(light.r,light.g,light.b,light.a)
+                }
+                4 -> when (x) {
+                    0 -> lightDir.x += smallValue
+                    1 -> lightDir.y += smallValue
+                    2 -> lightDir.z += smallValue
+                }
             }
             1 -> {
                 when (x) {
@@ -657,8 +770,37 @@ class TableEdit {
 
     fun tabCellMinus(tab: Int, x: Int, y: Int) {
         when (tab) {
-            0 -> {
-
+            0 -> when (y) {
+                0 -> smallValue *= 0.5f
+                1 -> {
+                    when (x) {
+                        0 -> bg.r -= 1/255f
+                        1 -> bg.g -= 1/255f
+                        2 -> bg.b -= 1/255f
+                    }
+                    bg.set(bg.r,bg.g,bg.b,bg.a)
+                }
+                2 -> {
+                    when (x) {
+                        0 -> ambient.r -= 1/255f
+                        1 -> ambient.g -= 1/255f
+                        2 -> ambient.b -= 1/255f
+                    }
+                    ambient.set(ambient.r,ambient.g,ambient.b,ambient.a)
+                }
+                3 -> {
+                    when (x) {
+                        0 -> light.r -= 1/255f
+                        1 -> light.g -= 1/255f
+                        2 -> light.b -= 1/255f
+                    }
+                    light.set(light.r,light.g,light.b,light.a)
+                }
+                4 -> when (x) {
+                    0 -> lightDir.x -= smallValue
+                    1 -> lightDir.y -= smallValue
+                    2 -> lightDir.z -= smallValue
+                }
             }
             1 -> {
                 when (x) {
@@ -698,7 +840,7 @@ class TableEdit {
     fun tabCanDot(tab: Int, x: Int, y: Int): Boolean {
         when (tab) {
             0 -> {
-
+                return y == 0 || y == 4
             }
             1 -> return true
         }
@@ -708,7 +850,7 @@ class TableEdit {
     fun tabCanMinus(tab: Int, x: Int, y: Int): Boolean {
         when (tab) {
             0 -> {
-
+                return y == 4
             }
             1 -> return true
         }

@@ -199,7 +199,7 @@ class QuadMesh {
         for (i in 0 until vertex.size) {
             if (vLight.size <= i) vLight.add(Color(0f,0f,0f,0f))
             if (vNormal.size > i && !vNormal[i].isZero) {
-                val n = dir.cpy().sub(vNormal[i].cpy().mul(matrix))
+                val n = dir.cpy().sub(vNormal[i].cpy().mul(matrix.cpy().setTranslation(0f,0f,0f)))
                 vLight[i].add(light.cpy().mul(1-n.len()/2))
             }
         }
