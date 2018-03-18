@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.utils.Array
 
 class Main {
     //Main is created after GDX is set up so the below can be initialized on construction
@@ -24,8 +26,12 @@ class Main {
     val renderer = Quad3DRender(cam,quadDraw)
     val mesh = QuadMesh()
     val mesh2 = QuadMesh()
-    val cube = QuadMesh()
     val cursor = Vector2()
+
+    val pos = Vector3()
+    val nor = Vector3(0f,-1f,0f)
+    val box = BoundingBox(Vector3(-0.25f,0f,-0.25f), Vector3(0.25f,1f,0.25f))
+    val geom = Array<Quad3D>()
 
 
     fun create() {
@@ -38,99 +44,54 @@ class Main {
         cam.update()
         renderer.camOverscan = 1.5f
 
-        mesh.vertex.add(Vector3(-2f,-3f,-2f))
-        mesh.vertex.add(Vector3(2f,-1f,-2f))
-        mesh.vertex.add(Vector3(2f,2f,-2f))
-        mesh.vertex.add(Vector3(-2f,2f,-2f))
-        mesh.color.add(Color(1f,0f,0f,1f))
-        mesh.color.add(Color(0f,1f,0f,1f))
-        mesh.color.add(Color(0f,0f,1f,1f))
-        mesh.color.add(Color(1f,1f,0f,1f))
-        mesh.sprite.add(TextureRegion())
-        mesh.checker.add(1)
-        mesh.index.add(0,1,2,3)
+        mesh.vertex.add(Vector3(-0.25f,-1f,-0.25f))
+        mesh.vertex.add(Vector3(0.25f,-1f,-0.25f))
+        mesh.vertex.add(Vector3(0.25f,0f,-0.25f))
+        mesh.vertex.add(Vector3(-0.25f,0f,-0.25f))
+        mesh.vertex.add(Vector3(-0.0625f,-1f,0.25f))
+        mesh.vertex.add(Vector3(0.0625f,-1f,0.25f))
+        mesh.vertex.add(Vector3(0.0625f,0f,0.25f))
+        mesh.vertex.add(Vector3(-0.0625f,0f,0.25f))
+        mesh.index.add(0,1,2,3) //front
+        mesh.index.add(1,5,6,2) //right
+        mesh.index.add(5,4,7,6) //back
+        mesh.index.add(4,0,3,7) //left
+        mesh.index.add(4,5,1,0) //top
+        mesh.index.add(6,7,3,2) //bottom
+        mesh.type.add(1,1,1)
+        mesh.type.add(1,1,1)
+        mesh.checker.add(0,0,0)
+        mesh.checker.add(0,0,0)
+        mesh.lit.add(true,true,true)
+        mesh.lit.add(true,true,true)
 
-        mesh.vertex.add(Vector3(-1f,-1f,0f))
-        mesh.vertex.add(Vector3(1f,-1f,0f))
-        mesh.vertex.add(Vector3(1f,1f,0f))
-        mesh.vertex.add(Vector3(-1f,1f,0f))
-        mesh.sprite.add(TextureRegion(img))
-        mesh.index.add(4,5,6,7)
-
-        mesh.vertex.add(Vector3(-1f,-1f,2f))
-        mesh.vertex.add(Vector3(1f,-1f,2f))
-        mesh.vertex.add(Vector3(1f,1f,2f))
-        mesh.vertex.add(Vector3(-1f,1f,2f))
-        mesh.sprite.add(TextureRegion(grass))
-        mesh.index.add(8,9,10,11)
-
-        mesh.matrix.translate(0f,0f,10f)
-
-
-        mesh2.vertex.add(Vector3(0f,0f,0f))
-        mesh2.vertex.add(Vector3(-0.25f,-0.75f,-0.25f))
-        mesh2.vertex.add(Vector3(0.25f,-0.75f,-0.25f))
-        mesh2.vertex.add(Vector3(0.25f,-0.75f,0.25f))
-        mesh2.vertex.add(Vector3(-0.25f,-0.75f,0.25f))
-        mesh2.vertex.add(Vector3(0f,-1f,0f))
-        mesh2.index.add(0,1,5,2)
-        mesh2.index.add(0,2,5,3)
-        mesh2.index.add(0,3,5,4)
-        mesh2.index.add(0,4,5,1)
-        mesh2.color.add(Color(0f,0f,0.5f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-        mesh2.color.add(Color(0f,0f,1f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-        mesh2.color.add(Color(0f,0f,0.5f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-        mesh2.color.add(Color(0f,0f,1f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-        mesh2.color.add(Color(0f,0f,0.5f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-        mesh2.color.add(Color(0f,0f,1f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-        mesh2.color.add(Color(0f,0f,0.5f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-        mesh2.color.add(Color(0f,0f,1f,1f))
-        mesh2.color.add(Color(0f,0f,0.75f,1f))
-//        mesh2.checker.add(2)
-//        mesh2.checker.add(2)
-//        mesh2.checker.add(2)
-//        mesh2.checker.add(2)
-
-
-        cube.vertex.add(Vector3(-1f,-1f,-1f))
-        cube.vertex.add(Vector3(1f,-1f,-1f))
-        cube.vertex.add(Vector3(1f,1f,-1f))
-        cube.vertex.add(Vector3(-1f,1f,-1f))
-        cube.vertex.add(Vector3(-1f,-1f,1f))
-        cube.vertex.add(Vector3(1f,-1f,1f))
-        cube.vertex.add(Vector3(1f,1f,1f))
-        cube.vertex.add(Vector3(-1f,1f,1f))
-        cube.index.add(0,1,2,3) //front
-        cube.index.add(1,5,6,2) //right
-        cube.index.add(5,4,7,6) //back
-        cube.index.add(4,0,3,7) //left
-        cube.index.add(4,5,1,0) //top
-        cube.index.add(6,7,3,2) //bottom
-//        cube.type.add(0,0,0)
-//        cube.type.add(0,0,0)
-//        cube.checker.add(1,1,1)
-//        cube.checker.add(1,1,1)
-        cube.lit.add(true,true,true)
-        cube.lit.add(true,true,true)
-//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
-//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
-//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
-//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
-//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
-//        cube.color.add(Color.BLUE,Color.BLUE,Color.BLUE,Color.BLUE)
-        cube.calcNormals()
-
+        quadDraw.maxDrawCallsPer = 2048
         quadDraw.checkerSize = 1
         quadDraw.width = w
         quadDraw.height = h
         quadDraw.mkBuffer()
+
+        var quad = Quad3D()
+        quad.pts[0].set(-5f,-2f,-5f)
+        quad.pts[1].set(5f,0f,-5f)
+        quad.pts[2].set(5f,2f,5f)
+        quad.pts[3].set(-5f,0f,5f)
+        geom.add(quad)
+
+        for (g in geom) {
+            g.calc()
+            val v = mesh2.vertex.size
+            for (i in 0..3) mesh2.vertex.add(g.pts[i])
+            mesh2.index.add((v).toShort(),(v+1).toShort(),(v+2).toShort(),(v+3).toShort())
+            mesh2.type.add(0)
+            mesh2.lit.add(true)
+            mesh2.sprite.add(TextureRegion(grass))
+        }
+
+        mesh2.calcNormals()
+        mesh2.lightAmbient(Color(0.125f,0.125f,0.125f,1f))
+        mesh2.lightDir(Color(1f,1f,1f,1f),Vector3(1f,1f,1f).nor())
+
     }
 
     fun render() {
@@ -139,23 +100,37 @@ class Main {
 
         camController.update(deltatime)
         cam.update()
-
-        mesh.matrix.rotate(0f,1f,0f,deltatime*32)
         cursor.add(camController.dpad)
-        mesh2.matrix.setToTranslation(cursor.x,0f,cursor.y).rotate(0f,1f,0f,statetime*180)
-        cube.matrix.setToRotation(Vector3(1f,0.75f,-0.25f).nor(),-statetime*45)
-        cube.unlight()
-        cube.lightAmbient(Color(0.25f,0.25f,0.25f,1f))
-        cube.lightDir(Color(1f,1f,1f,1f),Vector3(1f,1f,1f).nor())
+        pos.x = cursor.x
+        pos.z = cursor.y
+
+        for (g in geom) {
+            val bound = BoundingBox(box.min.cpy().add(pos),box.max.cpy().add(pos))
+            if (bound.intersects(g.box)) {
+                val y = g.interpolateY(pos.cpy())
+                System.out.println(y)
+                if (!y.isNaN()) {
+                    pos.y = y
+                    nor.set(g.normal)
+                }
+            }
+        }
+
+        System.out.println("$pos")
+
+        mesh.matrix.setToTranslation(pos).rotate(Vector3(0f,-1f,0f),nor)
+        mesh.calcNormals()
+        mesh.unlight()
+        mesh.lightAmbient(Color(0.125f,0.125f,0.125f,1f))
+        mesh.lightDir(Color(1f,1f,1f,1f),Vector3(1f,1f,1f).nor())
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         quadDraw.begin()
         renderer.clear()
 
-        mesh.trnsPrjAdd(renderer)
-        mesh2.trnsPrjAdd(renderer)
-        cube.trnsPrjLightAdd(renderer)
+        mesh.trnsPrjLightAdd(renderer)
+        mesh2.trnsPrjLightAdd(renderer)
         renderer.render()
 
         quadDraw.end()

@@ -1,10 +1,13 @@
 package net.jorhlok.test3d3
 
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.BoundingBox
 
 class Quad3D() {
     val pts = Array(4,{Vector3()})
     val normal = Vector3()
+    val box = BoundingBox()
+
     val alphax = FloatArray(4)
     val betax = FloatArray(4)
     val alphay = FloatArray(4)
@@ -47,6 +50,14 @@ class Quad3D() {
                 betaz[i] += matrix[i * 4 + j] * y[j]
             }
         }
+    }
+
+    fun bounds() { box.set(pts) }
+
+    fun calc() {
+        nor()
+        alphabeta()
+        bounds()
     }
 
     fun interpolateX(pt: Vector3) = interpolateValue(pt.y,pt.z,alphax,betax,pts[0].x,pts[1].x,pts[2].x,pts[3].x)

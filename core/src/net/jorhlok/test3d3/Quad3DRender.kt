@@ -51,7 +51,9 @@ class Quad3DRender(val cam: Camera, val draw: QuadDraw) {
 //            v.y = (cam.viewportHeight * camOverscan * (v.y + 1) / 2) - (cam.viewportHeight * camOverscan / 2) + (cam.viewportHeight / 2)
             v.x = ( cam.viewportWidth*camOverscan*(v.x + 1) - cam.viewportWidth*camOverscan + cam.viewportWidth )*0.5f
             v.y = ( cam.viewportHeight*camOverscan*(v.y + 1) - cam.viewportHeight*camOverscan + cam.viewportHeight )*0.5f
-            v.z = (v.z + 1) / 2
+//            System.out.println(v.z)
+//            v.z = (v.z + 1) * 0.5f
+//            System.out.println("\t${v.z}")
         }
     }
 }
