@@ -107,7 +107,7 @@ class Main {
         for (g in geom) {
             val bound = BoundingBox(box.min.cpy().add(pos),box.max.cpy().add(pos))
             if (bound.intersects(g.box)) {
-                val y = g.interpolateY2(pos)
+                val y = g.interpolateY(pos)
                 System.out.println(y)
                 if (!y.isNaN()) {
                     pos.y = y

@@ -1,5 +1,6 @@
 package net.jorhlok.test3d3
 
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -11,11 +12,14 @@ class Quad3D() {
     val box = BoundingBox()
 
     val alphax = FloatArray(4)
-    val betax = FloatArray(4)
     val alphay = FloatArray(4)
-    val betay = FloatArray(4)
     val alphaz = FloatArray(4)
-    val betaz = FloatArray(4)
+    val betax = com.badlogic.gdx.utils.Array<Vector2>()
+    val betay = com.badlogic.gdx.utils.Array<Vector2>()
+    val betaz = com.badlogic.gdx.utils.Array<Vector2>()
+    val valsx = FloatArray(4)
+    val valsy = FloatArray(4)
+    val valsz = FloatArray(4)
 
     fun nor() {
         //calc normal
@@ -31,36 +35,21 @@ class Quad3D() {
     }
 
     fun alphabeta() {
-        val matrix = arrayOf(1f,0f,0f,0f,
-                            -1f,1f,0f,0f,
-                            -1f,0f,0f,1f,
-                            1f,-1f,1f,-1f)
-        val x = arrayOf(pts[0].x,pts[1].x,pts[2].x,pts[3].x)
-        val y = arrayOf(pts[0].y,pts[1].y,pts[2].y,pts[3].y)
-        val z = arrayOf(pts[0].z,pts[1].z,pts[2].z,pts[3].z)
-
+        betax.clear()
+        betay.clear()
+        betaz.clear()
         for (i in 0..3) {
-            alphax[i] = 0f
-            betax[i] = 0f
-            alphay[i] = 0f
-            betay[i] = 0f
-            alphaz[i] = 0f
-            betaz[i] = 0f
-            for (j in 0..3) {
-                val m = matrix[i * 4 + j]
-                System.out.println("i$i\t$m\t\t${x[j]}\t\t${y[j]}\t\t${z[j]}")
-                alphax[i] += m * y[j]
-                betax[i] += m * z[j]
-                alphay[i] += m * x[j]
-                betay[i] += m * z[j]
-                alphaz[i] += m * x[j]
-                betaz[i] += m * y[j]
-            }
-            System.out.println()
+            val j = (i+1)%4
+            alphax[i] = Math.sqrt(((pts[j].y - pts[i].y) * (pts[j].y - pts[i].y) + (pts[j].z - pts[i].z) * (pts[j].z - pts[i].z)).toDouble()).toFloat()
+            alphay[i] = Math.sqrt(((pts[j].x - pts[i].x) * (pts[j].x - pts[i].x) + (pts[j].z - pts[i].z) * (pts[j].z - pts[i].z)).toDouble()).toFloat()
+            alphaz[i] = Math.sqrt(((pts[j].x - pts[i].x) * (pts[j].x - pts[i].x) + (pts[j].y - pts[i].y) * (pts[j].y - pts[i].y)).toDouble()).toFloat()
+            betax.add(Vector2(pts[i].y,pts[i].z))
+            valsx[i] = pts[i].x
+            betay.add(Vector2(pts[i].x,pts[i].z))
+            valsy[i] = pts[i].y
+            betaz.add(Vector2(pts[i].x,pts[i].y))
+            valsz[i] = pts[i].z
         }
-        System.out.println("${alphax.asList()}\t${alphay.asList()}\t${alphaz.asList()}")
-        System.out.println("${betax.asList()}\t${betay.asList()}\t${betaz.asList()}")
-        System.out.println()
     }
 
     fun bounds() { box.set(pts) }
@@ -71,59 +60,22 @@ class Quad3D() {
         bounds()
     }
 
-    fun interpolateX(pt: Vector3) = interpolateValue(pt.y,pt.z,alphax,betax,pts[0].x,pts[1].x,pts[2].x,pts[3].x)
-    fun interpolateY(pt: Vector3) = interpolateValue(pt.x,pt.z,alphay,betay,pts[0].y,pts[1].y,pts[2].y,pts[3].y)
-    fun interpolateZ(pt: Vector3) = interpolateValue(pt.x,pt.y,alphaz,betaz,pts[0].z,pts[1].z,pts[2].z,pts[3].z)
+    fun interpolateX(pt: Vector3) = interpolateValue(Vector2(pt.y,pt.z),alphax,betax,valsx)
+    fun interpolateY(pt: Vector3) = interpolateValue(Vector2(pt.x,pt.z),alphay,betay,valsy)
+    fun interpolateZ(pt: Vector3) = interpolateValue(Vector2(pt.x,pt.y),alphaz,betaz,valsz)
 
-    fun interpolateValue(x: Float, y: Float, alpha: FloatArray, beta: FloatArray, val0: Float, val1: Float, val2: Float, val3: Float): Float {
-        val aa = alpha[3]*beta[2] - alpha[2]*beta[3]
-        System.out.println("\t$aa\ta ${alpha.asList()}\tb ${beta.asList()}")
-        if (aa == 0f) return Float.NaN
-        val bb = alpha[3]*beta[0] - alpha[0]*beta[3] + alpha[1]*beta[2]
-                - alpha[2]*beta[1] + x*beta[3] - y*alpha[3]
-        val cc = alpha[1]*beta[0] - alpha[0]*beta[1] + x*beta[1] - y*alpha[1]
-        val det = Math.sqrt((bb*bb - 4*aa*cc).toDouble()).toFloat()
-        val m = (-bb+det)/(2*aa)
-        val l = (x-alpha[0]-alpha[2]*m)/(alpha[1]+alpha[3]*m)
-        System.out.println("\t$l\t$m")
-        if (m < 0f || m > 1f || l < 0f || l > 1f) return Float.NaN
+    fun interpolateValue(pt: Vector2, alpha: FloatArray, pts2d: com.badlogic.gdx.utils.Array<Vector2>, vals: FloatArray): Float {
+        if (Intersector.isPointInPolygon(pts2d,pt)) {
+            val dsttop = Math.abs((pt.x - pts2d[0].x) * (pts2d[1].y - pts2d[0].y) - (pt.y - pts2d[0].y) * (pts2d[1].x - pts2d[0].x)) / alpha[0]
+            val dstbtm = Math.abs((pt.x - pts2d[2].x) * (pts2d[3].y - pts2d[2].y) - (pt.y - pts2d[2].y) * (pts2d[3].x - pts2d[2].x)) / alpha[2]
+            val dstlf = Math.abs((pt.x - pts2d[3].x) * (pts2d[0].y - pts2d[3].y) - (pt.y - pts2d[3].y) * (pts2d[0].x - pts2d[3].x)) / alpha[3]
+            val dstrt = Math.abs((pt.x - pts2d[1].x) * (pts2d[2].y - pts2d[1].y) - (pt.y - pts2d[1].y) * (pts2d[2].x - pts2d[1].x)) / alpha[1]
 
-        val ll = 1-l
-        val mm = 1-m
-        return val0*ll*mm+val3*l*mm+val1*ll*m+val2*l*m
-    }
-
-    fun interpolateY2(pt: Vector3): Float { //closer but not perfect, probably need inverse bilinear
-        val pts2d = com.badlogic.gdx.utils.Array<Vector2>()
-        pts2d.add(Vector2(pts[0].x,pts[0].z))
-        pts2d.add(Vector2(pts[1].x,pts[1].z))
-        pts2d.add(Vector2(pts[2].x,pts[2].z))
-        pts2d.add(Vector2(pts[3].x,pts[3].z))
-        val pt2d = Vector2(pt.x,pt.z)
-        val inside = Intersector.isPointInPolygon(pts2d,pt2d)
-        if (inside) {
-            var totaldst = 0f
-            val dst = Array(4,{0f})
-            for (i in 0..3) {
-                dst[i] = pt2d.dst(pts2d[i])
-                totaldst += dst[i]
-            }
-            totaldst = 1/totaldst
-            dst[0] *= totaldst
-            var min = dst[0]
-            var max = dst[0]
-            for (i in 1..3) {
-                dst[i] *= totaldst
-                min = Math.min(min,dst[i])
-                max = Math.min(max,dst[i])
-            }
-            val maxmin = max+min
-            var value = 0f
-            for (i in 0..3) {
-                System.out.println("r${dst[i]/totaldst}\tmaxmin/r${maxmin/dst[i]}")
-                value += pts[i].y*maxmin/dst[i]*0.5f
-            }
-            return value
+            val u = dstlf/(dstlf+dstrt)
+            val v = dsttop/(dsttop + dstbtm)
+            val uu = 1-u
+            val vv = 1-v
+            return vals[0]*uu*vv+vals[3]*u*vv+vals[1]*uu*v+vals[2]*u*v
         }
         return Float.NaN
     }
