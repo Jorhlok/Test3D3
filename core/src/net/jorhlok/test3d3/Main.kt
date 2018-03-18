@@ -30,7 +30,7 @@ class Main {
 
     val pos = Vector3()
     val nor = Vector3(0f,-1f,0f)
-    val box = BoundingBox(Vector3(-0.25f,0f,-0.25f), Vector3(0.25f,1f,0.25f))
+    val box = BoundingBox(Vector3(-0.25f,0f,-0.25f), Vector3(0.25f,2f,0.25f))
     val geom = Array<Quad3D>()
 
 
@@ -72,10 +72,10 @@ class Main {
         quadDraw.mkBuffer()
 
         var quad = Quad3D()
-        quad.pts[0].set(-5f,-2f,-5f)
-        quad.pts[1].set(5f,0f,-5f)
-        quad.pts[2].set(5f,2f,5f)
-        quad.pts[3].set(-5f,0f,5f)
+        quad.pts[0].set(1.1f,1.1f,1.1f)
+        quad.pts[1].set(5.2f,3.2f,1.2f)
+        quad.pts[2].set(5.3f,5.3f,5.3f)
+        quad.pts[3].set(1.4f,3.4f,5.4f)
         geom.add(quad)
 
         for (g in geom) {

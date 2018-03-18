@@ -29,7 +29,10 @@ class Quad3D() {
     }
 
     fun alphabeta() {
-        val matrix = arrayOf(1f,0f,0f,0f,-1f,1f,0f,0f,-1f,0f,0f,1f,1f,-1f,1f,-1f)
+        val matrix = arrayOf(1f,0f,0f,0f,
+                            -1f,1f,0f,0f,
+                            -1f,0f,0f,1f,
+                            1f,-1f,1f,-1f)
         val x = arrayOf(pts[0].x,pts[1].x,pts[2].x,pts[3].x)
         val y = arrayOf(pts[0].y,pts[1].y,pts[2].y,pts[3].y)
         val z = arrayOf(pts[0].z,pts[1].z,pts[2].z,pts[3].z)
@@ -42,14 +45,20 @@ class Quad3D() {
             alphaz[i] = 0f
             betaz[i] = 0f
             for (j in 0..3) {
-                alphax[i] += matrix[i * 4 + j] * y[j]
-                betax[i] += matrix[i * 4 + j] * z[j]
-                alphay[i] += matrix[i * 4 + j] * x[j]
-                betay[i] += matrix[i * 4 + j] * z[j]
-                alphaz[i] += matrix[i * 4 + j] * x[j]
-                betaz[i] += matrix[i * 4 + j] * y[j]
+                val m = matrix[i * 4 + j]
+                System.out.println("i$i\t$m\t\t${x[j]}\t\t${y[j]}\t\t${z[j]}")
+                alphax[i] += m * y[j]
+                betax[i] += m * z[j]
+                alphay[i] += m * x[j]
+                betay[i] += m * z[j]
+                alphaz[i] += m * x[j]
+                betaz[i] += m * y[j]
             }
+            System.out.println()
         }
+        System.out.println("${alphax.asList()}\t${alphay.asList()}\t${alphaz.asList()}")
+        System.out.println("${betax.asList()}\t${betay.asList()}\t${betaz.asList()}")
+        System.out.println()
     }
 
     fun bounds() { box.set(pts) }
@@ -66,6 +75,7 @@ class Quad3D() {
 
     fun interpolateValue(x: Float, y: Float, alpha: FloatArray, beta: FloatArray, val0: Float, val1: Float, val2: Float, val3: Float): Float {
         val aa = alpha[3]*beta[2] - alpha[2]*beta[3]
+        System.out.println("\t$aa\ta ${alpha.asList()}\tb ${beta.asList()}")
         if (aa == 0f) return Float.NaN
         val bb = alpha[3]*beta[0] - alpha[0]*beta[3] + alpha[1]*beta[2]
                 - alpha[2]*beta[1] + x*beta[3] - y*alpha[3]
@@ -73,6 +83,7 @@ class Quad3D() {
         val det = Math.sqrt((bb*bb - 4*aa*cc).toDouble()).toFloat()
         val m = (-bb+det)/(2*aa)
         val l = (x-alpha[0]-alpha[2]*m)/(alpha[1]+alpha[3]*m)
+        System.out.println("\t$l\t$m")
         if (m < 0f || m > 1f || l < 0f || l > 1f) return Float.NaN
 
         val ll = 1-l
