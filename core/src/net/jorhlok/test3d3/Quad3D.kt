@@ -1,5 +1,7 @@
 package net.jorhlok.test3d3
 
+import com.badlogic.gdx.math.Intersector
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 
@@ -89,5 +91,40 @@ class Quad3D() {
         val ll = 1-l
         val mm = 1-m
         return val0*ll*mm+val3*l*mm+val1*ll*m+val2*l*m
+    }
+
+    fun interpolateY2(pt: Vector3): Float { //closer but not perfect, probably need inverse bilinear
+        val pts2d = com.badlogic.gdx.utils.Array<Vector2>()
+        pts2d.add(Vector2(pts[0].x,pts[0].z))
+        pts2d.add(Vector2(pts[1].x,pts[1].z))
+        pts2d.add(Vector2(pts[2].x,pts[2].z))
+        pts2d.add(Vector2(pts[3].x,pts[3].z))
+        val pt2d = Vector2(pt.x,pt.z)
+        val inside = Intersector.isPointInPolygon(pts2d,pt2d)
+        if (inside) {
+            var totaldst = 0f
+            val dst = Array(4,{0f})
+            for (i in 0..3) {
+                dst[i] = pt2d.dst(pts2d[i])
+                totaldst += dst[i]
+            }
+            totaldst = 1/totaldst
+            dst[0] *= totaldst
+            var min = dst[0]
+            var max = dst[0]
+            for (i in 1..3) {
+                dst[i] *= totaldst
+                min = Math.min(min,dst[i])
+                max = Math.min(max,dst[i])
+            }
+            val maxmin = max+min
+            var value = 0f
+            for (i in 0..3) {
+                System.out.println("r${dst[i]/totaldst}\tmaxmin/r${maxmin/dst[i]}")
+                value += pts[i].y*maxmin/dst[i]*0.5f
+            }
+            return value
+        }
+        return Float.NaN
     }
 }
