@@ -60,8 +60,8 @@ class Main {
         mesh.index.add(6,7,3,2) //bottom
         mesh.type.add(1,1,1)
         mesh.type.add(1,1,1)
-        mesh.checker.add(0,0,0)
-        mesh.checker.add(0,0,0)
+        mesh.checker.add(1,1,1)
+        mesh.checker.add(1,1,1)
         mesh.lit.add(true,true,true)
         mesh.lit.add(true,true,true)
 
@@ -76,6 +76,12 @@ class Main {
         quad.pts[1].set(5f,0f,-5f)
         quad.pts[2].set(5f,2f,5f)
         quad.pts[3].set(-5f,0f,5f)
+        geom.add(quad)
+        quad = Quad3D()
+        quad.pts[0].set(-5f,0f,5f)
+        quad.pts[1].set(5f,0.5f,5f)
+        quad.pts[2].set(5f,1f,15f)
+        quad.pts[3].set(-5f,1.5f,15f)
         geom.add(quad)
 
         for (g in geom) {

@@ -75,7 +75,8 @@ class Quad3D() {
             val v = dsttop/(dsttop + dstbtm)
             val uu = 1-u
             val vv = 1-v
-            return vals[0]*uu*vv+vals[3]*u*vv+vals[1]*uu*v+vals[2]*u*v
+            //swapped 1 and 3 below because rotation direction mismatch
+            return vals[0]*uu*vv+vals[1]*u*vv+vals[3]*uu*v+vals[2]*u*v
         }
         return Float.NaN
     }
