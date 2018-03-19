@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Array
  *     *
  *D***C*
  */
-class QuadDraw {
+open class QuadDraw {
 
     enum class Type {
         DistortedSprite,
@@ -31,21 +31,21 @@ class QuadDraw {
     var fbfilter = Texture.TextureFilter.Nearest
     var checkerSize = 1
     var maxDrawCallsPer = 1024 //prevents sharp angled quads in perspective from causing huge drawing lag spikes, hopefully?
-    private val white = Color(1f,1f,1f,1f)
-    private val rgba = Pixmap.Format.RGBA8888
-    private val nearest = Texture.TextureFilter.Nearest
-    private val cam = OrthographicCamera(width.toFloat(),height.toFloat())
-    private val batch = MultiColorPolygonSpriteBatch()
-    private var fb = FrameBuffer(rgba,1,1,false)
-    private val fbreg = TextureRegion()
-    private var fbcheck = FrameBuffer(rgba,1,1,false)
-    private var checktexA = Texture(1,1,rgba)
-    private var checktexB = Texture(1,1,rgba)
-    private val checkregA = TextureRegion()
-    private val checkregB = TextureRegion()
-    private val maxChecker = 2
-    private val px = Texture(1,1,rgba) //for drawing primitives
-    private var drawing = -1
+    protected val white = Color(1f,1f,1f,1f)
+    protected val rgba = Pixmap.Format.RGBA8888
+    protected val nearest = Texture.TextureFilter.Nearest
+    protected val cam = OrthographicCamera(width.toFloat(),height.toFloat())
+    protected val batch = MultiColorPolygonSpriteBatch()
+    protected var fb = FrameBuffer(rgba,1,1,false)
+    protected val fbreg = TextureRegion()
+    protected var fbcheck = FrameBuffer(rgba,1,1,false)
+    protected var checktexA = Texture(1,1,rgba)
+    protected var checktexB = Texture(1,1,rgba)
+    protected val checkregA = TextureRegion()
+    protected val checkregB = TextureRegion()
+    protected val maxChecker = 2
+    protected val px = Texture(1,1,rgba) //for drawing primitives
+    protected var drawing = -1
 
     init {
         val pixel = Pixmap(1,1,rgba)
@@ -289,7 +289,7 @@ class QuadDraw {
     fun point(a: Vector2, col: Color = white) { sprite(TextureRegion(px),a,col) }
 
     //gouraud shading
-    fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
+    open fun distortedSprite(spr: TextureRegion, a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
         if (drawing >= 0) {
             val lf = iterateOverLineGreedy(a, d)
             val rt = iterateOverLineGreedy(b, c)
@@ -367,7 +367,7 @@ class QuadDraw {
         }
     }
 
-    fun distortedQuad(a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
+    open fun distortedQuad(a: Vector2, b: Vector2, c: Vector2, d: Vector2, ga:Color, gb: Color, gc: Color, gd: Color) {
         if (drawing >= 0) {
             val lf = iterateOverLineGreedy(a, d)
             val rt = iterateOverLineGreedy(b, c)

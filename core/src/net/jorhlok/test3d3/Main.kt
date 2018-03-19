@@ -18,11 +18,11 @@ class Main {
     val font = DosFont()
     var statetime = 0f
 
-    val w = 640//*2
-    val h = 360//*2
+    val w = 640*2
+    val h = 360*2
     val cam = PerspectiveCamera(66.666667f, w.toFloat(), h.toFloat())
     val camController = FPControllerCamera(cam)
-    val quadDraw = QuadDraw()
+    val quadDraw: QuadDraw = QuickDraw()//QuadDraw()
     val renderer = Quad3DRender(cam,quadDraw)
     val mesh = QuadMesh()
     val mesh2 = QuadMesh()
